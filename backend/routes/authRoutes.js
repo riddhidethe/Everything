@@ -15,11 +15,12 @@ router.post("/register", async (req, res) => {
 
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
+    console.log("Hashed password "+hashedPassword);
 
     let user;
     if (role === "seller") user = new Seller({ name, email, password: hashedPassword });
     else if (role === "recruiter") user = new Recruiter({ name, email, password: hashedPassword });
-    else user = new User({ name, email, password: hashedPassword, role: "buyer" }); // Default to buyer
+    else user = new User({ name, email, password: hashedPassword }); // Default to buyer
 
     await user.save();
     res.status(201).json({ msg: "User registered successfully!" });
@@ -27,7 +28,10 @@ router.post("/register", async (req, res) => {
 
 // 📌 Login
 router.post("/login", async (req, res) => {
-    const { email, password } = req.body;
+    // const { email, password } = req.body;
+    const email = req.body.email;
+    const password = req.body.password;
+    console.log(email, password);
     
     let user = await User.findOne({ email }) || await Seller.findOne({ email }) || 
                await Recruiter.findOne({ email }) || await Admin.findOne({ email });
