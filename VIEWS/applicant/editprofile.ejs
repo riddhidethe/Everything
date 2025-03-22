@@ -49,9 +49,9 @@
 
         <div class="dropdown-box hidden" id="drop-box">
           <ul>
-            <li><a href="/jobSeeker/editprofile">Edit Profile</a></li>
-            <li><a href="/jobSeeker/changePassword">Change Password</a></li>
-            <li class="logout-btn"><a href="/jobSeeker/logout">Logout <i class="fa-solid fa-right-from-bracket"></i></a></li>
+            <li><a href="/api/buyer/edit-profile">Edit Profile</a></li>
+            <li><a href="/api/auth/change-password">Change Password</a></li>
+            <li class="logout-btn"><a href="/api/auth/logout">Logout <i class="fa-solid fa-right-from-bracket"></i></a></li>
           </ul>
         </div>
   
@@ -72,7 +72,7 @@
                 </div>
                 <div class="notification-lower notification-slot">
                   <p><span>Status:</span> <%= notification.application_status %></p>
-                  <a href="/jobSeeker/deleteNotification?jobid=<%= notification.job_id %>"><i class="fa-solid fa-trash"></i></a>
+                  <a href="/api/buyer/delete-notification?jobid=<%= notification.job_id %>"><i class="fa-solid fa-trash"></i></a>
                 </div>
             </li>
             <%})%>
@@ -87,8 +87,8 @@
 
         <% } else { %>
           <div class="button-box" id="btn-box">
-            <a class='myBtn' href="/jobSeeker/login">Applicant</a>
-            <a class='myBtn' href="/jobCreator/login">Recruiter</a>
+            <a class='myBtn' href="/api/auth/login">Applicant</a>
+            <a class='myBtn' href="/api/auth/login">Recruiter</a>
           </div>
         <% } %>
         
@@ -98,7 +98,7 @@
 
     <section class="edit-profile-section">
         <div class="edit-profile-container">
-            <form action="/jobSeeker/updateprofile" method="POST" enctype="multipart/form-data">
+            <form action="/api/profile/updateProfile" method="POST" enctype="multipart/form-data">
                 <input type="hidden" name="applicant_id" value="<%= applicant.applicant_id %>">
                 <div class="edit-profile-grid1">
                     <span class="applicant applicant-profile-box">
@@ -108,7 +108,7 @@
                                 <div class="profile-pic-box" id="profile-div" >
                                   <img src="/PUBLIC/ASSETS/UPLOADS/profile_images/<%= applicant.profile_pic_code %>" alt="Profile Photo" style="width: 150px; height: 160px; border-radius: 50%;">
                                   <input type="text" name="profilePic" value="<%=applicant.profile_pic_code %>" hidden>
-                                  <a href="/jobseeker/deleteProfilePic?picName=<%=applicant.profile_pic_code%>" id="removeProfilePic"><i class="fa-solid fa-xmark"></i> </a>
+                                  <a href="/api/buyer/delete-profile-pic?picName=<%=applicant.profile_pic_code%>" id="removeProfilePic"><i class="fa-solid fa-xmark"></i> </a>
                                 </div>
                                 
                             <% } else { %>

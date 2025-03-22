@@ -50,9 +50,9 @@
 
         <div class="dropdown-box hidden" id="drop-box">
           <ul>
-            <li><a href="/jobSeeker/editprofile">Edit Profile</a></li>
-            <li><a href="/jobSeeker/changePassword">Change Password</a></li>
-            <li class="logout-btn"><a href="/jobSeeker/logout">Logout <i class="fa-solid fa-right-from-bracket"></i></a></li>
+            <li><a href="/api/auth/edit-profile">Edit Profile</a></li>
+            <li><a href="/api/auth/change-password">Change Password</a></li>
+            <li class="logout-btn"><a href="/api/auth/logout">Logout <i class="fa-solid fa-right-from-bracket"></i></a></li>
           </ul>
         </div>
   
@@ -73,7 +73,7 @@
                 </div>
                 <div class="notification-lower notification-slot">
                   <p><span>Status:</span> <%= notification.application_status %></p>
-                  <a href="/jobSeeker/deleteNotification?jobid=<%= notification.job_id %>"><i class="fa-solid fa-trash"></i></a>
+                  <a href="/api/buyer/delete-notification?jobid=<%= notification.job_id %>"><i class="fa-solid fa-trash"></i></a>
                 </div>
             </li>
             <%})%>
@@ -88,8 +88,8 @@
 
         <% } else { %>
           <div class="button-box" id="btn-box">
-            <a class='myBtn' href="/jobSeeker/login">Applicant</a>
-            <a class='myBtn' href="/jobCreator/login">Recruiter</a>
+            <a class='myBtn' href="/api/auth/login">Applicant</a>
+            <a class='myBtn' href="/api/auth/login">Recruiter</a>
           </div>
         <% } %>
         
@@ -129,7 +129,7 @@
                 <% if(isApplied){ %>
                 <div class="apply-btn applied-box"><i class="fa-solid fa-circle-check"></i> Applied</div>
                 <% } else { %>
-                  <a class="apply-btn" href="/jobSeeker/applyJob?jobID=<%=job.job_id%>">Apply Now</a>
+                  <a class="apply-btn" href="/api/buyer/apply-job?jobID=<%=job.job_id%>">Apply Now</a>
                 <% } %>
             </div>
             <div class="description">
@@ -208,7 +208,7 @@
                   <img src="/PUBLIC/ASSETS/IMAGES/company_logos/<%=job.company %>.png" alt="company logo">
                 </div>
                 <div class="moreDetailsbtn">
-                  <a href="/jobSeeker/applyJob?jobID=<%job.job_id%>">Apply Now</a>
+                  <a href="/api/auth/apply-job?jobID=<%job.job_id%>">Apply Now</a>
                 </div>
               </div>
             </div>

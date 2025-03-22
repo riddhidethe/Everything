@@ -18,15 +18,14 @@
                 <img src="/public/assets/images/form_images/signup.png" alt="login-img" /> 
             </div>
             <div class="rightContainer formContainer">
-                <h1 class='formTitle'>Enter the World of Careers</h1>
                 <div class="formBox">
-                    <form action="/jobSeeker/registration" method="post">
+                    <form action="/api/auth/register" method="post">
                         <div class="formInputBox">
-                            <input type="text" placeholder="Username" class='formInput' name="username" required/>
+                            <input type="text" placeholder="Username" class='formInput' name="name" required/>
                             <i class="fa-solid fa-user formIcons"></i>
                         </div>
                         <div class="formInputBox">
-                            <input type="email" placeholder="Email Id" class='formInput' name="emailID" required/>
+                            <input type="email" placeholder="Email Id" class='formInput' name="email" required/>
                             <i class="fa-solid fa-envelope formIcons"></i>
                         </div>
                         <div class="formInputBox">
@@ -34,8 +33,18 @@
                             <i class="fa-solid fa-eye-slash formIcons" id="password-icon"></i>
                         </div>
                         <div class="formInputBox">
-                            <input type="password" placeholder="Confirm Password" class='formInput' name="con_password"id="password2" required/>
+                            <input type="password" placeholder="Confirm Password" class='formInput' name="confirmPassword"id="confirmPassword" required/>
                             <i class="fa-solid fa-eye-slash formIcons" id="password-icon2"></i>
+                        </div>
+                        <div class="formInputBox roleSelector">
+                            <select name="role" class="formInput" required>
+                                <option value="" disabled selected>Select your role</option>
+                                <option value="seller">Seller</option>
+                                <option value="buyer">Buyer</option>
+                                <option value="recruiter">Recruiter</option>
+                                <option value="applicant">Applicant</option>
+                            </select>
+                            <i class="fa-solid fa-user-tag formIcons"></i>
                         </div>
                         <span id="error-msg" style="color: red;"><%= errorMsg %></span><br>
                         <button class='formButton'>Register</button>
@@ -43,7 +52,7 @@
                     
                 </div>
                 <div class="formText">
-                    Already have an account? <a href="/jobSeeker/login"><span class='formLink'>Login</span></a>
+                    Already have an account? <a href="/api/auth/login"><span class='formLink'>Login</span></a>
                 </div>
             </div>
         </div>
@@ -67,7 +76,7 @@
         });
 
         const togglePassword2 = document.getElementById('password-icon2');
-        const password2 = document.getElementById('password2');
+        const password2 = document.getElementById('confirmPassword');
 
         togglePassword2.addEventListener('click', function (e) {
             let type = password2.getAttribute('type');

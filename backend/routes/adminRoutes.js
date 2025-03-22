@@ -5,7 +5,7 @@ const Report = require("../models/Report");
 
 const router = express.Router();
 
-// 📌 Get all users
+// 📌 Get all users  
 router.get("/users", authMiddleware(["admin"]), async (req, res) => {
     try {
         const users = await User.find({}, "name email role status");

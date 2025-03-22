@@ -28,7 +28,7 @@
             <header class="recruiter-header" id="recruiter_header"></header>
             <div class="recruiter-content-container">
                 <div class="job-grid">
-                    <a class="addJobCard" href="/jobCreator/addJob">
+                    <a class="addJobCard" href="/api/recruiter/create-job">
                         <!-- <img src="/PUBLIC/assets/images/add_job.png" alt="add_symbol" class="addSymbol"> -->
                         <i class="fa-solid fa-circle-plus addSymbol"></i>
                     </a>
@@ -46,11 +46,11 @@
                                 <desc><%= job.job_desc %></desc>
                             </div>
 
-                            <a href="/jobCreator/viewDetails?job_id=<%= job.job_id %>">
+                            <a href="/api/recruiter/viewDetails?job_id=<%= job.job_id %>">
                                 <button type="button"><bu>View Details</bu></button>
                               </a>
                           
-                            <a href="/jobCreator/removeJob?job_id= <%= job.job_id %>"> 
+                            <a href="/api/recruiter/removeJob?job_id= <%= job.job_id %>"> 
                               <i class="fa-solid fa-trash deleteIcon"></i>
                             </a>
                             

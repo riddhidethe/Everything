@@ -122,7 +122,7 @@
     </script>
     <script>
         function FetchChartData() {
-            fetch('/jobCreator/charts').then(Response => {
+            fetch('/api/recruiter/charts').then(Response => {
                 return Response.json()
             }).then(chartData => {
                 const { jobRole, count } = chartData

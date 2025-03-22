@@ -10,6 +10,10 @@ const sendMail = require("../../FUNCTION/mailSetup"); // Equivalent to mailFunc 
 
 const router = express.Router();
 
+router.get('/register', (req, res) => {
+    res.render('Form/applicant_registration', { errorMsg: null });
+});
+
 // 📌 Register a new user
 router.post("/register", async (req, res) => {
     try {
@@ -60,6 +64,11 @@ router.post("/register", async (req, res) => {
         console.error(error);
         res.status(500).json({ msg: "Server error" });
     }
+});
+
+// route to open the login form
+router.get('/login', (req, res) => {
+    res.render('form/login_via_password', { errorMsg: null, display: null });
 });
 
 // 📌 Login

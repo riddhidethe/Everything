@@ -78,7 +78,7 @@
 
 
             const fetchApplicantionList = () => {
-                axios.get('http://localhost:3200/jobCreator/allSavedApplications').then((response) => {
+                axios.get('http://localhost:3200/api/recruiter/allSavedApplications').then((response) => {
                     // console.log('then block mei huuuuuu');
                     setApplicationList(response.data.rows); 
                 })
@@ -93,7 +93,7 @@
                 const jobRole = {job_role: jobRoleFilter};
 
                 // Send POST request to /filters endpoint
-                axios.post('http://localhost:3200/jobCreator/filteredApplications', jobRole)
+                axios.post('http://localhost:3200/api/recruiter/filteredApplications', jobRole)
                 .then(response => {
                     setApplicationList(response.data.rows);
                 })
@@ -162,7 +162,7 @@
                                         <h3>{application.first_name} {application.last_name}</h3>
                                         <p>{application.job_role}</p>
                                     </div>
-                                    <a className="save-btn" href={`/jobCreator/unsaveTheApplicationFromSaved?application_id=${application.application_id}&isSaved=${application.isSaved}`}><i className="fa-solid fa-bookmark"></i>  
+                                    <a className="save-btn" href={`/api/recruiter/unsaveTheApplicationFromSaved?application_id=${application.application_id}&isSaved=${application.isSaved}`}><i className="fa-solid fa-bookmark"></i>  
                                     </a>                                    
                                 </div>
 
@@ -180,7 +180,7 @@
 
                                 <div className="applicant-card-row">
                                     <a type="submit" className="viewDetailsBtn">View Details</a>
-                                    <a className="deleteBtn" href={`/jobCreator/deleteApplication?application_id=${application.application_id}&from=${'saved_application'}`}><i className="fa-solid fa-trash"></i></a>
+                                    <a className="deleteBtn" href={`/api/recruiter/deleteApplication?application_id=${application.application_id}&from=${'saved_application'}`}><i className="fa-solid fa-trash"></i></a>
                                 </div>
                             </div>
                         ))

@@ -99,7 +99,7 @@
         <div class="rightContainer formContainer">
             <h1 class='formTitle'>Welcome Back!</h1>
             <div class="formBox">
-                <form action="/jobSeeker/login_via_otp" method="post">
+                <form action="/api/auth/login_via_otp" method="post">
                     <div class="formInputBox">
                         <input type="email" placeholder="Email Id" name = 'emailID' class='formInput' required/>
                         <i class="fa-solid fa-envelope formIcons"></i>
@@ -108,11 +108,11 @@
                     <button class='formButton'>Send OTP</button>
                 </form>
                 <div class="formLinks">
-                    <a href="/jobSeeker/login">Login via Password</a>
+                    <a href="/api/auth/login">Login via Password</a>
                 </div>
             </div>
             <div class="formText">
-                Don't have an account? <a href="/jobSeeker/registration"><span class='formLink'>Sign Up</span></a>
+                Don't have an account? <a href="/api/auth/register"><span class='formLink'>Sign Up</span></a>
             </div>
         </div>
       </div>

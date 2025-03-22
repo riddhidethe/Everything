@@ -78,7 +78,7 @@
 
 
             const fetchApplicantionList = () => {
-                axios.get('http://localhost:3200/jobCreator/applications').then((response) => {
+                axios.get('http://localhost:3200/api/recruiter/applications').then((response) => {
                     // console.log('then block mei huuuuuu');
                     setApplicationList(response.data.rows); 
                 })
@@ -93,7 +93,7 @@
                 const jobRole = {job_role: jobRoleFilter};
 
                 // Send POST request to /filters endpoint
-                axios.post('http://localhost:3200/jobCreator/filteredApplications', jobRole)
+                axios.post('http://localhost:3200/api/recruiter/filteredApplications', jobRole)
                 .then(response => {
                     setApplicationList(response.data.rows);
                 })
@@ -159,9 +159,9 @@
                                         <p>{application.job_role}</p>
                                     </div>
                                         {
-                                            application.isSaved ?  <a className="save-btn" href={`/jobCreator/saveUnsaveTheApplication?application_id=${application.application_id}&isSaved=${application.isSaved}`}><i className="fa-solid fa-bookmark"></i>  
+                                            application.isSaved ?  <a className="save-btn" href={`/api/recruiter/saveUnsaveTheApplication?application_id=${application.application_id}&isSaved=${application.isSaved}`}><i className="fa-solid fa-bookmark"></i>  
                                             </a>
-                                            : <a className="save-btn" href={`/jobCreator/saveUnsaveTheApplication?application_id=${application.application_id}&isSaved=${application.isSaved}`}>
+                                            : <a className="save-btn" href={`/api/recruiter/saveUnsaveTheApplication?application_id=${application.application_id}&isSaved=${application.isSaved}`}>
                                                 <i className="fa-regular fa-bookmark"></i>
                                             </a>
                                         }
@@ -181,9 +181,9 @@
                                 <p className="expField">Exp: <span className="maxExp">{application.exp_level}</span> years</p>
 
                                 <div className="applicant-card-row">
-                                    <a href={`/jobCreator/applicantDetails?applicant_id=${application.applicant_id}&application_id=${application.application_id}&job_role=${application.job_role}`} className="viewDetailsBtn">View Details</a>
+                                    <a href={`/api/recruiter/applicantDetails?applicant_id=${application.applicant_id}&application_id=${application.application_id}&job_role=${application.job_role}`} className="viewDetailsBtn">View Details</a>
 
-                                    <a className="deleteBtn" href={`/jobCreator/deleteApplication?application_id=${application.application_id}&from=${'all_application'}`}><i className="fa-solid fa-trash"></i></a>
+                                    <a className="deleteBtn" href={`/api/recruiter/deleteApplication?application_id=${application.application_id}&from=${'all_application'}`}><i className="fa-solid fa-trash"></i></a>
                                 </div>
                             </div>
                         ))

@@ -2,7 +2,7 @@ var title = document.querySelector('h1')
 var h1Text = title.textContent;
 var clutter = "";
 h1Text.split('').forEach((character, index)=>{
-    if(index <= 2){
+    if(index <= 10){
         clutter += `<span>${character}<span>`;
     }else{
         clutter += `<span class="coloredTxt">${character}<span>`;

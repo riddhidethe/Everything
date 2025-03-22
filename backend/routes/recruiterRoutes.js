@@ -268,7 +268,7 @@ router.get("/deleteApplication", authMiddleware(["recruiter"]), async (req, res)
             .populate("userId", "email")
             .populate("jobId", "title company");
             
-        if (!application) return res.status(404).json({ msg: "Application not found" });
+        if (!application) return res.status(404).json({ msg: "Application not found" });    
         
         // Send rejection email
         await sendStatusEmail(
