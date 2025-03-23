@@ -10,6 +10,10 @@ const sendMail = require("../../FUNCTION/mailSetup"); // Equivalent to mailFunc 
 
 const router = express.Router();
 
+router.post("/protected", authMiddleware, (req, res) => {
+    res.json({ message: "Access granted", user: req.user });
+});
+
 router.get('/register', (req, res) => {
     res.render('Form/applicant_registration', { errorMsg: null });
 });
@@ -56,10 +60,10 @@ router.post("/register", async (req, res) => {
         if (role === "applicant") {
             // Create session or token for form completion
             const token = jwt.sign({ id: user._id, role: user.role }, "SECRET_KEY", { expiresIn: "1d" });
-            return res.status(201).json({ msg: "Registration started", token, completeProfile: true });
+            return res.render('form/complete_form', { msg: "Registration started", token });
         }
         
-        res.status(201).json({ msg: "User registered successfully!" });
+        res.render('applicant/applicant_homepage', { msg: "User registered successfully!" });
     } catch (error) {
         console.error(error);
         res.status(500).json({ msg: "Server error" });
@@ -78,8 +82,7 @@ router.post("/login", async (req, res) => {
         
         let user = await User.findOne({ email }) || 
                   await Seller.findOne({ email }) || 
-                  await Recruiter.findOne({ email }) || 
-                  await Admin.findOne({ email });
+                  await Recruiter.findOne({ email });
 
         if (!user) return res.status(400).json({ msg: "Invalid credentials" });
 
@@ -87,12 +90,16 @@ router.post("/login", async (req, res) => {
         if (user.role === "applicant" && !user.isActive) {
             return res.status(403).json({ msg: "Account is inactive" });
         }
+        // Check if applicant is active
+        if (user.role === "buyer" && !user.isActive) {
+            return res.status(403).json({ msg: "Account is inactive" });
+        }
 
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) return res.status(400).json({ msg: "Invalid credentials" });
 
         const token = jwt.sign({ id: user._id, role: user.role }, "SECRET_KEY", { expiresIn: "7d" });
-        res.json({ token, role: user.role, msg: "Logged in successfully" });
+        res.render('/applicant/applicant_homepage', { msg: "Logged in successfully", role: user.role, token });
     } catch (error) {
         console.error(error);
         res.status(500).json({ msg: "Server error" });
@@ -168,7 +175,7 @@ router.post("/verify-otp", async (req, res) => {
 
         // Generate token
         const token = jwt.sign({ id: user._id, role: user.role }, "SECRET_KEY", { expiresIn: "7d" });
-        res.json({ token, role: user.role, msg: "Logged in successfully" });
+        res.render('/applicant/applicant_homepage', { msg: "Logged in successfully", role: user.role, token });
     } catch (error) {
         console.error(error);
         res.status(500).json({ msg: "Server error" });

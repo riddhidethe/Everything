@@ -78,7 +78,9 @@
 
 
             const fetchApplicantionList = () => {
-                axios.get('http://localhost:3200/api/recruiter/allSavedApplications').then((response) => {
+                axios.get('http://localhost:5000/api/recruiter/allSavedApplications', {
+                    headers: { Authorization: `Bearer ${yourToken}` }
+                }).then((response) => {
                     // console.log('then block mei huuuuuu');
                     setApplicationList(response.data.rows); 
                 })
@@ -93,7 +95,9 @@
                 const jobRole = {job_role: jobRoleFilter};
 
                 // Send POST request to /filters endpoint
-                axios.post('http://localhost:3200/api/recruiter/filteredApplications', jobRole)
+                axios.post('http://localhost:5000/api/recruiter/filteredApplications', {
+                    headers: { Authorization: `Bearer ${yourToken}` }
+                }, jobRole)
                 .then(response => {
                     setApplicationList(response.data.rows);
                 })

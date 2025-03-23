@@ -139,8 +139,7 @@
 
         <% } else { %>
         <div class="button-box" id="btn-box">
-          <a class='myBtn' href="/api/auth/login">Applicant</a>
-          <a class='myBtn' href="/api/auth/login">Recruiter</a>
+          <a class='myBtn' href="/api/auth/login">Login</a>
         </div>
         <% } %>
       </div>
@@ -166,7 +165,9 @@
 
         const fetchDashboardDetails = () => {
           axios
-            .get("http://localhost:3200/api/buyer/dashboard")
+            .get("http://localhost:5000/api/buyer/dashboard", {
+              headers: { Authorization: `Bearer ${yourToken}` }
+            })
             .then((response) => {
               const { user, applications, uniqueJobs } = response.data;
               setUserProfile(user);

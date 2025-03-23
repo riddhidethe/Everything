@@ -11,12 +11,12 @@ function SideNavBar() {
                 <div className="nav-menu-box">
                     <h4 className="nav-menu-title">Menu</h4>
                     <ul className="nav-menu-list">
-                        <a href="/jobCreator/"><li className="nav-menu-items"><span className="material-symbols-outlined">space_dashboard</span>Dashboard</li></a>
-                        <a href="/jobCreator/jobList"><li className="nav-menu-items"><span className="material-symbols-outlined">work</span>Jobs</li></a>
+                        <a href="/api/recruiter/dashboard"><li className="nav-menu-items"><span className="material-symbols-outlined">space_dashboard</span>Dashboard</li></a>
+                        <a href="/api/recruiter/jobList"><li className="nav-menu-items"><span className="material-symbols-outlined">work</span>Jobs</li></a>
 
-                        <a href="/jobCreator/jobApplications"><li className="nav-menu-items"><span className="material-symbols-outlined">data_table</span>Applications</li></a>
+                        <a href="/api/recruiter/applications"><li className="nav-menu-items"><span className="material-symbols-outlined">data_table</span>Applications</li></a>
                         
-                        <a href="/jobCreator/savedApplications"><li className="nav-menu-items"><span className="material-symbols-outlined">bookmark</span>Saved</li></a>
+                        <a href="/api/recruiter/allSavedApplications"><li className="nav-menu-items"><span className="material-symbols-outlined">bookmark</span>Saved</li></a>
                     </ul>
                 </div>
             </div>

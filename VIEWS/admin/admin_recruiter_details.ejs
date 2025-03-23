@@ -71,7 +71,9 @@
             }, []);
 
             const fetchRecruiterData = () => {
-                axios.get('http://localhost:3200/admin/getRecruiterData').then((response) => {
+                axios.get('http://localhost:5000/api/admin/users', {
+                    headers: { Authorization: `Bearer ${yourToken}` }
+                }).then((response) => {
                     const data = response.data.recruiterList[0] || {};
                     setRecruiterList({
                         creator_fname: data.creator_fname || '',
@@ -112,7 +114,7 @@
                             <h2>Edit Recruiter Details</h2>
                         </div>
                         <div className="details-form-content-box">
-                            <form action="/admin/updateRecruiterDetails" method="post">
+                            <form action="/api/admin/update-user" method="post">
                                 <div className="details-form-left">
                                     <div className="image-box">
                                         <img src={`/PUBLIC/ASSETS/IMAGES/company_logos/${recruiter.company}.png`} alt="company-logo" />
@@ -186,7 +188,7 @@
                                             <td>{job.min_salary} - {job.max_salary}</td>
                                             <td>{job.min_exp} - {job.max_exp}</td>
                                             <td>{job.due_date.substring(0, 10).split("-").reverse().join("-")}</td>                                        
-                                            <td className="deleteButton"><a href={`/admin/deleteJob?job_id=${job.job_id}`}><i className="fa-solid fa-trash"></i></a></td>
+                                            <td className="deleteButton"><a href={`/api/admin/delete-job?job_id=${job.job_id}`}><i className="fa-solid fa-trash"></i></a></td>
                                         </tr>
                                     ))}
                                 </tbody>

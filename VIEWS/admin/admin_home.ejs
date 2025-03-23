@@ -94,7 +94,9 @@
 
             // fetch function to get all recruiter data
             const fetchRecruiterData = ()=>{
-                axios.get('http://localhost:3200/admin/recruiterList').then((response)=>{
+                axios.get('http://localhost:5000/api/admin/users', {
+                    headers: { Authorization: `Bearer ${yourToken}` }
+                }).then((response)=>{
                     setRecruiterList(response.data.rows);
                 }).catch((error)=>{
                     console.error("Error fetching data:", error);
@@ -109,7 +111,9 @@
                 };
 
                 // get the filtered recruiter list
-                axios.post('http://localhost:3200/admin/filterRecruiter', filter)
+                axios.post('http://localhost:5000/api/admin/filter-users', 
+                { headers: { Authorization: `Bearer ${yourToken}` } },
+                filter)
                 .then(response => {
                     setRecruiterList(response.data.rows);
                     setCurrentPage(1);
@@ -230,15 +234,15 @@
 
                                             {
                                                 recruiter.isActive == 1 ? (
-                                                    <td><a class="action-btn" href={`/admin/takeAction?creator_id=${recruiter.creator_id}&isActive=0`}>Deactivate</a></td>
+                                                    <td><a class="action-btn" href={`/api/admin/take-action?user_id=${recruiter.creator_id}&isActive=0`}>Deactivate</a></td>
                                                 ) : (
-                                                    <td><a class="action-btn" href={`/admin/takeAction?creator_id=${recruiter.creator_id}&isActive=1`}>Activate</a></td>
+                                                    <td><a class="action-btn" href={`/api/admin/take-action?user_id=${recruiter.creator_id}&isActive=1`}>Activate</a></td>
                                                 )
                                             }
                                             <td>
-                                                <a href={`/admin/editRecruiter?creator_id=${recruiter.creator_id}`} className="editButton">Edit <i class="fa-solid fa-pen-to-square"></i></a>
+                                                <a href={`/api/admin/update-user?userId=${recruiter.creator_id}`} className="editButton">Edit <i class="fa-solid fa-pen-to-square"></i></a>
                                             </td>                                           
-                                            <td className="deleteButton"><a href={`/admin/deleteRecruiter?creator_id=${recruiter.creator_id}`}><i class="fa-solid fa-trash"></i></a></td>
+                                            <td className="deleteButton"><a href={`/api/admin/delete-user?user_id=${recruiter.creator_id}`}><i class="fa-solid fa-trash"></i></a></td>
                                         </tr>
                                         ))
                                     }

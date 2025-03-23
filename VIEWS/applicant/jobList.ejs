@@ -81,8 +81,7 @@
 
       <% } else { %>
         <div class="button-box" id="btn-box">
-          <a class='myBtn' href="/api/auth/login">Applicant</a>
-          <a class='myBtn' href="/api/auth/login">Recruiter</a>
+          <a class='myBtn' href="/api/auth/login">Login</a>
         </div>
       <% } %>
       
@@ -145,7 +144,9 @@
 
 
       const fetchJobList = () => {
-        axios.get("http://localhost:3200/api/buyer/jobs").then((response) => {
+        axios.get("http://localhost:5000/api/buyer/jobs", {
+          headers: { Authorization: `Bearer ${yourToken}` }
+        }).then((response) => {
             setJobList(response.data.rows);
           }).catch((error) => {
             console.error("Error fetching data:", error);
@@ -162,7 +163,9 @@
           sort_by: sortBy,
         };
 
-        axios.post('http://localhost:3200/api/buyer/filters', filters)
+        axios.post('http://localhost:5000/api/buyer/filters', {
+          headers: { Authorization: `Bearer ${yourToken}` }
+        }, filters)
           .then(response => {
             setJobList(response.data.rows);
           })

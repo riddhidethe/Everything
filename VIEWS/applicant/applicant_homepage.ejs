@@ -51,8 +51,8 @@
 
         <div class="dropdown-box hidden" id="drop-box">
           <ul>
-            <li><a href="/api/buyer/editprofile">Edit Profile</a></li>
-            <li><a href="/api/buyer/changePassword">Change Password</a></li>
+            <li><a href="/api/buyer/edit-profile">Edit Profile</a></li>
+            <li><a href="/api/buyer/change-password">Change Password</a></li>
             <li class="logout-btn"><a href="/api/auth/logout">Logout <i class="fa-solid fa-right-from-bracket"></i></a></li>
           </ul>
         </div>
@@ -74,7 +74,7 @@
                 </div>
                 <div class="notification-lower notification-slot">
                   <p><span>Status:</span> <%= notification.application_status %></p>
-                  <a href="/api/buyer/deleteNotification?jobid=<%= notification.job_id %>"><i class="fa-solid fa-trash"></i></a>
+                  <a href="/api/buyer/delete-notification?jobid=<%= notification.job_id %>"><i class="fa-solid fa-trash"></i></a>
                 </div>
             </li>
             <%})%>
@@ -89,8 +89,7 @@
 
         <% } else { %>
           <div class="button-box" id="btn-box">
-            <a class='myBtn' href="/api/auth/login">Applicant</a>
-            <a class='myBtn' href="/api/auth/login">Recruiter</a>
+            <a class='myBtn' href="/api/auth/login">Login</a>
           </div>
         <% } %>
         
@@ -189,7 +188,7 @@
         
 
         <div class="explore">
-          <a href="/api/buyer/jobList">Explore More</a>
+          <a href="/api/buyer/job-list">Explore More</a>
         </div>
       </div>
     </section>

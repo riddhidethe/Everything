@@ -35,6 +35,30 @@
             box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
             object-fit: cover;
         }
+        .status-active {
+            color: green;
+            font-weight: bold;
+        }
+        .status-blocked {
+            color: red;
+            font-weight: bold;
+        }
+        .toast-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #4CAF50;
+            color: white;
+            padding: 16px;
+            border-radius: 4px;
+            z-index: 1000;
+            display: none;
+        }
+        .filter-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
@@ -42,16 +66,14 @@
         <nav class="recruiter-navigation" id="sidenavbar"></nav>
         <div class="recruiter-main-container">
             <header class="recruiter-header" id="recruiter_header"></header>
+            <div id="toast-notification" class="toast-notification"></div>
             <div class="recruiter-application-container" id="application-container"></div>
-            
             
             <footer>
                 <div class="footerContainer" id="footer"></div>
             </footer>
         </div>
     </section>
-
-    
 
     <script type="text/babel" src="/PUBLIC/components/AdminSideNavBar.js"></script>
     <script type="text/babel" src="/PUBLIC/components/RecruiterHeader.js"></script>
@@ -60,66 +82,109 @@
     <script type="text/babel">
         const profilePic = "<%= profilePic %>";
         const username = "<%= username %>";
+        const toastNotification = "<%= toastNotification %>";
         console.log('profile pic val: ' + profilePic);
         console.log(profilePic);
+
+        // Show toast notification if present
+        if (toastNotification) {
+            const toast = document.getElementById('toast-notification');
+            toast.textContent = toastNotification;
+            toast.style.display = 'block';
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000);
+        }
 
         const { useEffect, useState } = React;
 
         function App() {
-            const [applicant, setApplicantList] = useState({
-                first_name: '',
-                last_name: '',
-                age: '',
-                mobile_no: '',
-                gender: '',
-                exp_level: '',
-                email_id: '',
+            const [users, setUsers] = useState([]);
+            const [selectedUser, setSelectedUser] = useState({
+                _id: '',
+                name: '',
+                email: '',
                 password: '',
-                username: '',
+                role: '',
+                status: '',
                 profile_pic_code: ''
             });
-            const [applicationList, setApplicationList] = useState([]);
             const [currentPage, setCurrentPage] = useState(1);
+            const [filters, setFilters] = useState({ role: '', status: '' });
             const itemsPerPage = 5;
 
             useEffect(() => {
-                fetchApplicantData();
+                fetchUsers();
             }, []);
 
-            const fetchApplicantData = () => {
-                axios.get('http://localhost:3200/admin/getApplicantData').then((response) => {
-                    const data = response.data.applicantList[0] || {};
-                    setApplicantList({
-                        first_name: data.first_name || '',
-                        last_name: data.last_name || '',
-                        age: data.age || '',
-                        mobile_no: data.mobile_no || '',
-                        gender: data.gender || '',
-                        exp_level: data.exp_level || '',
-                        email_id: data.email_id || '',
-                        password: data.password || '',
-                        username: data.username || '',
-                        profile_pic_code: data.profile_pic_code || ''
-                    });
-                    setApplicationList(response.data.applicationList);
+            const fetchUsers = () => {
+                axios.get('http://localhost:5000/api/admin/users').then((response) => {
+                    headers: { Authorization: `Bearer ${yourToken}` };
+                    setUsers(response.data);
                 }).catch((error) => {
-                    console.error("Error fetching data:", error);
+                    console.error("Error fetching users:", error);
+                });
+            };
+
+            const fetchFilteredUsers = () => {
+                axios.post('http://localhost:5000/api/admin/filter-users', filters).then((response) => {
+                    headers: { Authorization: `Bearer ${yourToken}` };
+                    setUsers(response.data.rows);
+                }).catch((error) => {
+                    console.error("Error fetching filtered users:", error);
+                });
+            };
+
+            const handleUserSelect = (userId) => {
+                axios.get(`http://localhost:5000/api/admin/user-details/${userId}`).then((response) => {
+                    headers: { Authorization: `Bearer ${yourToken}` };
+                    const userData = response.data.userData;
+                    setSelectedUser({
+                        _id: userData._id,
+                        name: userData.name || '',
+                        email: userData.email || '',
+                        password: '',
+                        role: userData.role || '',
+                        status: userData.status || '',
+                        profile_pic_code: userData.profile_pic_code || ''
+                    });
+                }).catch((error) => {
+                    console.error("Error fetching user details:", error);
                 });
             };
 
             const handleInputChange = (e) => {
                 const { name, value } = e.target;
-                setApplicantList((prevApplicant) => ({
-                    ...prevApplicant,
+                setSelectedUser((prevUser) => ({
+                    ...prevUser,
                     [name]: value,
                 }));
             };
 
-            const indexOfLastApplication = currentPage * itemsPerPage;
-            const indexOfFirstApplication = indexOfLastApplication - itemsPerPage;
-            const currentApplication = applicationList.slice(indexOfFirstApplication, indexOfLastApplication);
+            const handleFilterChange = (e) => {
+                const { name, value } = e.target;
+                setFilters((prevFilters) => ({
+                    ...prevFilters,
+                    [name]: value,
+                }));
+            };
 
-            const totalPages = Math.ceil(applicationList.length / itemsPerPage);
+            const handleBlockUser = (userId, currentStatus) => {
+                const newStatus = currentStatus === 'active' ? '0' : '1';
+                window.location.href = `/admin/take-action?user_id=${userId}&isActive=${newStatus}`;
+            };
+
+            const handleDeleteUser = (userId) => {
+                if (window.confirm('Are you sure you want to delete this user?')) {
+                    window.location.href = `/admin/delete-user?user_id=${userId}`;
+                }
+            };
+
+            const indexOfLastUser = currentPage * itemsPerPage;
+            const indexOfFirstUser = indexOfLastUser - itemsPerPage;
+            const currentUsers = users.slice(indexOfFirstUser, indexOfLastUser);
+
+            const totalPages = Math.ceil(users.length / itemsPerPage);
 
             const handlePageChange = (pageNumber) => {
                 setCurrentPage(pageNumber);
@@ -129,69 +194,73 @@
                 <>
                     <div className="details-form-container">
                         <div className="details-form-title-box">
-                            <h2>Edit Applicant Details</h2>
+                            <h2>User Management</h2>
                         </div>
+                        
+                        <div className="filter-container">
+                            <div className="dropbox_filter">
+                                <select className="sel_box" name="role" onChange={(e) => handleFilterChange(e)} value={filters.role}>
+                                    <option value="">All Roles</option>
+                                    <option value="user">User</option>
+                                    <option value="admin">Admin</option>
+                                    <option value="recruiter">Recruiter</option>
+                                </select>
+                            </div>
+                            <div className="dropbox_filter">
+                                <select className="sel_box" name="status" onChange={(e) => handleFilterChange(e)} value={filters.status}>
+                                    <option value="">All Status</option>
+                                    <option value="active">Active</option>
+                                    <option value="blocked">Blocked</option>
+                                </select>
+                            </div>
+                            <button onClick={fetchFilteredUsers} className="filter-btn">Apply Filters</button>
+                        </div>
+
                         <div className="details-form-content-box">
-                            <form action="/admin/updateApplicantDetails" method="post">
+                            <form action={`/api/admin/update-user/${selectedUser._id}`} method="post">
                                 <div className="details-form-left">
                                     <div className="image-box">
-                                        <img src={`/PUBLIC/ASSETS/UPLOADS/profile_images/${applicant.profile_pic_code}`} alt="profile-pic" className="applicant_image" />
+                                        <img src={selectedUser.profile_pic_code ? `/PUBLIC/ASSETS/UPLOADS/profile_images/${selectedUser.profile_pic_code}` : "/PUBLIC/ASSETS/IMAGES/default-profile.png"} alt="profile-pic" className="applicant_image" />
                                     </div>
                                 </div>
                                 <div className="details-form-right">
                                     <div className="detail-form-row">
                                         <div className="detail-form-input-box">
-                                            <label htmlFor="first_name">First Name</label>
-                                            <input type="text" name="first_name" id="first_name" placeholder="First Name" value={applicant.first_name} onChange={handleInputChange} />
+                                            <label htmlFor="name">Name</label>
+                                            <input type="text" name="name" id="name" placeholder="Name" value={selectedUser.name} onChange={handleInputChange} />
                                         </div>
                                         <div className="detail-form-input-box">
-                                            <label htmlFor="last_name">Last Name</label>
-                                            <input type="text" name="last_name" id="last_name" placeholder="Last Name" value={applicant.last_name} onChange={handleInputChange} />
-                                        </div>
-                                        <div className="detail-form-input-box">
-                                            <label htmlFor="age">Age</label>
-                                            <input type="number" name="age" id="age" placeholder="Age" value={applicant.age} onChange={handleInputChange} />
+                                            <label htmlFor="email">Email</label>
+                                            <input type="email" name="email" id="email" placeholder="Email" value={selectedUser.email} onChange={handleInputChange} />
                                         </div>
                                     </div>
                                     <div className="detail-form-row">
-                                        <div className="detail-form-input-box">
-                                            <label htmlFor="mobile_no">Phn No</label>
-                                            <input type="text" name="mobile_no" id="mobile_no" placeholder="Phone No" value={applicant.mobile_no} onChange={handleInputChange} />
-                                        </div>
-                                        <div className="detail-form-input-box">
-                                            <label htmlFor="gender">Gender</label>
-                                            <input type="text" name="gender" id="gender" placeholder="Gender" value={applicant.gender} onChange={handleInputChange} />
-                                        </div>
-                                        <div className="detail-form-input-box">
-                                            <label htmlFor="exp_level">Experience(yrs)</label>
-                                            <input type="number" name="exp_level" id="exp_level" placeholder="Experience Level" value={applicant.exp_level} onChange={handleInputChange} />
-                                        </div>
-                                    </div>
-                                    <div className="detail-form-row">
-                                        <div className="detail-form-input-box">
-                                            <label htmlFor="email_id">Email</label>
-                                            <input type="email" name="email_id" id="email_id" placeholder="Email ID" value={applicant.email_id} onChange={handleInputChange} />
-                                        </div>
                                         <div className="detail-form-input-box">
                                             <label htmlFor="password">Password</label>
-                                            <input type="password" name="password" id="password" placeholder="Password" onChange={handleInputChange} />
+                                            <input type="password" name="password" id="password" placeholder="New Password" onChange={handleInputChange} />
                                             <i className="fa-solid fa-eye-slash"></i>
                                         </div>
-                                    </div>
-                                    <div className="detail-form-row">
                                         <div className="detail-form-input-box">
-                                            <label htmlFor="username">Username</label>
-                                            <input type="text" name="username" id="username" placeholder="Username" value={applicant.username} onChange={handleInputChange} />
-                                        </div>
-                                        <div className="dropbox_filter">
-                                            <select className="sel_box" id="sel_box" name="status" onChange={handleInputChange} value={applicant.status || ''}>
-                                                <option value="">Select a Status</option>
-                                                <option value="1">Active</option>
-                                                <option value="0">Inactive</option>
+                                            <label htmlFor="role">Role</label>
+                                            <select name="role" id="role" value={selectedUser.role} onChange={handleInputChange}>
+                                                <option value="">Select Role</option>
+                                                <option value="user">User</option>
+                                                <option value="admin">Admin</option>
+                                                <option value="recruiter">Recruiter</option>
                                             </select>
                                         </div>
                                     </div>
-                                    <button type="submit" className="update-btn">Update</button>
+                                    <div className="detail-form-row">
+                                        <div className="detail-form-input-box">
+                                            <label htmlFor="status">Account Status</label>
+                                            <select name="status" id="status" value={selectedUser.status} onChange={handleInputChange}>
+                                                <option value="">Select Status</option>
+                                                <option value="active">Active</option>
+                                                <option value="blocked">Blocked</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <button type="submit" className="update-btn" disabled={!selectedUser._id}>Update User</button>
                                 </div>
                             </form>
                         </div>
@@ -202,24 +271,33 @@
                             <table>
                                 <thead>
                                     <tr>
-                                        <th>Job Role</th>
-                                        <th>City</th>
-                                        <th>Company</th>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Role</th>
                                         <th>Status</th>
-                                        <th>Salary(Rs.)</th>
-                                        <th>Applied Date</th>
+                                        <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {currentApplication.map((application, index) => (
+                                    {currentUsers.map((user, index) => (
                                         <tr key={index}>
-                                            <td>{application.job_role}</td>
-                                            <td>{application.city}</td>
-                                            <td>{application.company}</td>
-                                            <td>{application.application_status}</td>
-                                            <td>{application.min_salary} - {application.max_salary}</td>
-                                            <td>{application.applied_date.substring(0, 10).split("-").reverse().join("-")}</td>
-                                            <td className="deleteButton"><a href={`/admin/deleteApplication?application_id=${application.application_id}`}><i className="fa-solid fa-trash"></i></a></td>
+                                            <td>{user.name}</td>
+                                            <td>{user.email}</td>
+                                            <td>{user.role}</td>
+                                            <td className={user.status === 'active' ? 'status-active' : 'status-blocked'}>
+                                                {user.status}
+                                            </td>
+                                            <td>
+                                                <button onClick={() => handleUserSelect(user._id)} className="action-btn edit">
+                                                    <i className="fa-solid fa-edit"></i>
+                                                </button>
+                                                <button onClick={() => handleBlockUser(user._id, user.status)} className="action-btn block">
+                                                    <i className={user.status === 'active' ? 'fa-solid fa-ban' : 'fa-solid fa-check'}></i>
+                                                </button>
+                                                <button onClick={() => handleDeleteUser(user._id)} className="action-btn delete">
+                                                    <i className="fa-solid fa-trash"></i>
+                                                </button>
+                                            </td>
                                         </tr>
                                     ))}
                                 </tbody>

@@ -166,6 +166,30 @@ router.get("/applicantDetails", authMiddleware(["recruiter"]), async (req, res) 
     }
 });
 
+// ✅ Recruiter's Job List Route
+router.get("/jobList", authMiddleware, async (req, res) => {
+    try {
+        if (!req.user) {
+            return res.redirect("/jobCreator/login");
+        }
+
+        const creator_id = req.user.id; // Assuming `req.user` contains the recruiter ID
+
+        // Fetch jobs created by this recruiter
+        const jobs = await Job.find({ creator_id });
+
+        res.render("recruiter/jobs", {
+            r1: jobs,
+            profilePic: req.user.profilePic,
+            username: req.user.username,
+            toastNotification: req.query.toastNotification || null
+        });
+    } catch (error) {
+        console.error("Error fetching job list:", error);
+        res.status(500).send("Server error");
+    }
+});
+
 // 📌 Update application status
 router.post("/applicantDetails", authMiddleware(["recruiter"]), async (req, res) => {
     try {
