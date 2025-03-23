@@ -170,7 +170,7 @@ router.get("/applicantDetails", authMiddleware(["recruiter"]), async (req, res) 
 router.get("/jobList", authMiddleware, async (req, res) => {
     try {
         if (!req.user) {
-            return res.redirect("/jobCreator/login");
+            return res.redirect("/api/auth/login");
         }
 
         const creator_id = req.user.id; // Assuming `req.user` contains the recruiter ID

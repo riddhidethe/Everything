@@ -1,6 +1,7 @@
 const express = require('express');
 const jwt = require("jsonwebtoken");
 const authMiddleware = require("../middleware/authMiddleware");
+const upload = require('../../FUNCTION/uploadSetup')
 const User = require("../models/User");
 const Seller = require("../models/Seller");
 const Recruiter = require("../models/Recruiter");
@@ -9,50 +10,10 @@ const multer = require('multer');
 const path = require('path');
 const router = express.Router();
 
-// Configure multer for file uploads
-const storage = multer.diskStorage({
-    destination: function(req, file, cb) {
-        const uploadPath = file.fieldname === 'prof-pdf' 
-            ? path.join(__dirname, '../uploads/resumes') 
-            : path.join(__dirname, '../uploads/profiles');
-        cb(null, uploadPath);
-    },
-    filename: function(req, file, cb) {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        const ext = path.extname(file.originalname);
-        cb(null, file.fieldname + '-' + uniqueSuffix + ext);
-    }
-});
-
-const fileFilter = function(req, file, cb) {
-    if (file.fieldname === 'prof-pdf') {
-        if (file.mimetype === 'application/pdf') {
-            cb(null, true);
-        } else {
-            cb(new Error('Only PDF files are allowed for resume uploads!'), false);
-        }
-    } else if (file.fieldname === 'prof-image') {
-        if (file.mimetype.startsWith('image/')) {
-            cb(null, true);
-        } else {
-            cb(new Error('Only image files are allowed for profile pictures!'), false);
-        }
-    } else {
-        cb(new Error('Unexpected field'), false);
-    }
-};
-
-const upload = multer({ 
-    storage: storage,
-    fileFilter: fileFilter,
-    limits: {
-        fileSize: 5 * 1024 * 1024 // 5MB max file size
-    }
-});
-
 // 📌 Initial profile data submission
-router.post('/profileComplete', authMiddleware(["applicant"]), upload.single('prof-image'), async (req, res) => {
+router.post('/profileComplete', upload.single('prof-image'), async (req, res) => {
     try {
+        console.log(req.body, req.file);
         const userId = req.user.id;
         const first_name = req.body.fname;
         const last_name = req.body.lname;
@@ -74,12 +35,8 @@ router.post('/profileComplete', authMiddleware(["applicant"]), upload.single('pr
             gender: gender,
             profile_pic_code: profile_pic_code
         };
-
-        res.status(200).json({ 
-            success: true, 
-            msg: "Profile picture uploaded successfully",
-            profileData 
-        });
+        console.log("Profile Data:", profileData);
+        res.render('form/uploadForm', { pd: profileData })
     } catch (error) {
         res.status(500).json({ success: false, msg: "Server error", error });
     }

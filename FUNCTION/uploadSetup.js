@@ -1,15 +1,5 @@
-// uploadSetup.js
-const express = require('express');
 const multer = require('multer');
 const path = require('path');
-const session = require('express-session');
-const app = express();
-
-app.use(session({
-    secret: 'your-secret-key',
-    resave: false,
-    saveUninitialized: false
-}));
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -22,7 +12,7 @@ const storage = multer.diskStorage({
         }
     },
     filename: function (req, file, cb) {
-        const applicantId = req.session.applicantId;
+        const applicantId = req.user?.id; // Extracting applicantId from JWT payload
         if (!applicantId) {
             return cb(new Error('Applicant ID is missing'), false);
         }
@@ -35,4 +25,4 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-module.exports = upload;
+module.exports = upload; // ✅ Export only the `upload` instance

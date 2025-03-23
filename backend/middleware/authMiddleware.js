@@ -5,7 +5,7 @@ const authMiddleware = (roles = []) => {
         const token = req.cookies.jwt; // Extract token from cookies
 
         if (!token) {
-            return res.status(401).redirect('/admin/login');
+            return res.status(401).redirect('/api/auth/login');
         }
 
         try {
@@ -19,7 +19,7 @@ const authMiddleware = (roles = []) => {
 
             next();
         } catch (error) {
-            return res.status(401).redirect('/admin/login');
+            return res.status(401).redirect('/api/auth/login');
         }
     };
 };
