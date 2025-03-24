@@ -176,7 +176,7 @@ li{
 }
 
 /* registration form  */
-.formsDiv .profilepicbox {
+.formsDiv .profile-box {
   display: flex;
   width: 414px;
   justify-content: space-between;

@@ -23,6 +23,11 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
+// Protect this route with authMiddleware
+router.get("/protected-route", authMiddleware, (req, res) => {
+    res.json({ msg: "You are authenticated!", user: req.user });
+});
+
 // 📌 Get all available products
 router.get("/products", async (req, res) => {
     try {

@@ -24,79 +24,153 @@
 
     
   </head>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+  // Get all the relevant elements
+  const profileBox = document.getElementById("profile-box");
+  const profileDiv = document.getElementById("profile-div"); // The profile picture container
+  const notificationBell = document.getElementById("notification-bell");
+  const dropdownBox = document.getElementById("drop-box");
+  const loginButton = document.getElementById("btn-box");
+  const notificationDetailBox = document.getElementById("notification-detail-box");
+  
+  // Hide profile elements by default
+  profileBox.style.display = "none";
+  notificationBell.style.display = "none";
+  
+  // Show login button by default
+  loginButton.style.display = "flex";
+  
+  // Make authentication check
+  fetch("/api/auth/check-auth", {
+    method: "GET",
+    credentials: "include"
+  })
+  .then(response => {
+    if (response.ok) {
+      // User is logged in - show profile elements and hide login
+      profileBox.style.display = "flex";
+      notificationBell.style.display = "flex"; 
+      loginButton.style.display = "none";
+      
+      // Event listener for profile dropdown
+      profileBox.addEventListener("click", () => {
+        dropdownBox.style.display = dropdownBox.style.display === "none" ? "flex" : "none";
+      });
+
+      // Fetch notifications - cookie is sent automatically
+      fetch("/api/buyer/notifications", {
+        method: "GET",
+        credentials: "include"
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.length > 0) {
+          notificationDetailBox.innerHTML = data.map(notification => `
+            <li class="notification">
+              <div class="notification-upper notification-slot">
+                <h3>${notification.job_role}</h3>
+                <div class="company-logo-box">
+                  <img src="/public/ASSETS/IMAGES/company_logos/${notification.company}.png" alt="company-logo">
+                </div>
+              </div>
+              <div class="notification-lower notification-slot">
+                <p><span>Status:</span> ${notification.application_status}</p>
+                <a href="#" onclick="deleteNotification('${notification.job_id}')"><i class="fa-solid fa-trash"></i></a>
+              </div>
+            </li>
+          `).join('');
+        } else {
+          notificationDetailBox.innerHTML = `<h3 class="no-notification">No notifications yet</h3>`;
+        }
+      });
+    } else {
+      // User is not logged in - keep profile hidden and show login button
+      profileBox.style.display = "none";
+      notificationBell.style.display = "none";
+      dropdownBox.style.display = "none";
+      loginButton.style.display = "block";
+    }
+  })
+  .catch(error => {
+    console.error("Error checking authentication:", error);
+    // Default to not logged in if there's an error
+    profileBox.style.display = "none";
+    notificationBell.style.display = "none";
+    dropdownBox.style.display = "none";
+    loginButton.style.display = "block";
+  });
+});
+
+// Updated logout function
+const handleLogout = async () => {
+    try {
+        // Call the backend logout route
+        await fetch("http://your-backend-url/api/auth/logout", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+        });
+
+        // Remove JWT token from localStorage or sessionStorage
+        localStorage.removeItem("token");  
+        localStorage.removeItem("userId"); 
+
+        // Redirect to the homepage
+        window.location.href = "/homepage";
+    } catch (error) {
+        console.error("Logout failed", error);
+    }
+};
+
+
+// Updated delete notification function
+function deleteNotification(jobId) {
+  fetch(`/api/buyer/delete-notification?jobid=${jobId}`, {
+    method: "DELETE",
+    credentials: "include"
+  }).then(() => {
+    location.reload();
+  });
+}
+  </script>
+  
+    
   <body>
     <!-- header section  -->
     <header>
       <div id="header-box">
-        <div class="header-container" id="header">       
-        </div>
-
-        <% if(isLogged != null && isLogged == true) { %>
-        <div class="profile-box">
+        <div class="header-container" id="header"></div>
+    
+        <div class="profile-box" id="profile-box">
           <div class="notification-box" id="notification-bell">
             <i class="fa-solid fa-bell"></i>
-            <% if(notiResult.length > 0) { %>
-            <div class="notification-indicator"></div>
-            <% } %>
+            <div class="notification-indicator" style="display: none;"></div>
           </div>
           
           <div class="profile-pic-div" id="profile-div">
             <% if(profilePic == null){ %>
-              <img src="/public/ASSETS/IMAGES/user.png" alt="profile-picture">
+              <img src="/PUBLIC/ASSETS/IMAGES/user.png" alt="profile-picture">
             <% }else{ %>
-            <img src="/public/ASSETS/UPLOADS/profile_images/<%= profilePic %>" alt="profile-picture">
+            <img src="/PUBLIC/ASSETS/UPLOADS/profile_images/<%= profilePic %>" alt="profile-picture">
             <% } %>
           </div>
         </div>
-
+    
         <div class="dropdown-box hidden" id="drop-box">
           <ul>
             <li><a href="/api/buyer/edit-profile">Edit Profile</a></li>
             <li><a href="/api/buyer/change-password">Change Password</a></li>
-            <li class="logout-btn"><a href="/api/auth/logout">Logout <i class="fa-solid fa-right-from-bracket"></i></a></li>
+            <li class="logout-btn"><a href="#" onclick="handleLogout">Logout <i class="fa-solid fa-right-from-bracket"></i></a></li>
           </ul>
         </div>
-  
-        <!-- notification area -->
-        <div class="notification-detail-box hidden" id="notification-detail-box">
-          
-          <%if(notiResult.length > 0){%>
-          
-          <ul>
-  
-            <% notiResult.forEach(notification =>{ %>
-              <li class="notification">
-                <div class="notification-upper notification-slot">
-                  <h3><%= notification.job_role %></h3>
-                  <div class="company-logo-box">
-                    <img src="/public/ASSETS/IMAGES/company_logos/<%= notification.company %>.png" alt="company-logo">
-                  </div>
-                </div>
-                <div class="notification-lower notification-slot">
-                  <p><span>Status:</span> <%= notification.application_status %></p>
-                  <a href="/api/buyer/delete-notification?jobid=<%= notification.job_id %>"><i class="fa-solid fa-trash"></i></a>
-                </div>
-            </li>
-            <%})%>
-            
-          </ul>
-  
-          <% }else{ %>
-            <h3 class="no-notification">No notifications yet</h3>
-          <% } %>
+    
+        <div class="notification-detail-box hidden" id="notification-detail-box"></div>
+    
+        <div class="button-box" id="btn-box">
+          <a class='myBtn' href="/api/auth/login">Login</a>
         </div>
-        <!-- notification area -->
-
-        <% } else { %>
-          <div class="button-box" id="btn-box">
-            <a class='myBtn' href="/api/auth/login">Login</a>
-          </div>
-        <% } %>
-        
       </div>
-
-      
-
     </header>
     <!-- header section ends here -->
 
@@ -240,34 +314,6 @@
     </footer>
 
 
-    <script>
-      let toastBox = document.getElementById("toastBox");
-      let toastMsg = '<i class="fa-regular fa-square-check"></i><%=toastNotification%>' ;
-  
-      window.onload = function (msg) {
-        let toast = document.createElement("div");
-        toast.classList.add("toast");
-        toast.innerHTML = toastMsg;
-        toastBox.appendChild(toast);
-        setTimeout(() => {
-          toast.remove();
-        }, 6000);
-      };
-
-      // Add JWT token to all API requests if available
-      const token = localStorage.getItem('token');
-      if (token) {
-        // Add token to fetch requests
-        const originalFetch = window.fetch;
-        window.fetch = function(url, options = {}) {
-          if (!options.headers) {
-            options.headers = {};
-          }
-          options.headers['Authorization'] = `Bearer ${token}`;
-          return originalFetch(url, options);
-        }
-      }
-    </script> 
 
 
     <!-- GSAP library -->

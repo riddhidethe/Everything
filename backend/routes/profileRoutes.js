@@ -11,7 +11,7 @@ const path = require('path');
 const router = express.Router();
 
 // 📌 Initial profile data submission
-router.post('/profileComplete', upload.single('prof-image'), async (req, res) => {
+router.post('/profileComplete', authMiddleware(["applicant"]), upload.single('prof-image'), async (req, res) => {
     try {
         console.log(req.body, req.file);
         const userId = req.user.id;
@@ -38,6 +38,7 @@ router.post('/profileComplete', upload.single('prof-image'), async (req, res) =>
         console.log("Profile Data:", profileData);
         res.render('form/uploadForm', { pd: profileData })
     } catch (error) {
+        console.log(error);
         res.status(500).json({ success: false, msg: "Server error", error });
     }
 });

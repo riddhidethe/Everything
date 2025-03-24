@@ -15,23 +15,106 @@
     integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <title>Find Jobs | Everything.india</title>
 </head>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    let token = localStorage.getItem("token"); // Get token from localStorage
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlToken = urlParams.get('token'); // Get token from URL
+    console.log(localStorage.getItem("token"));
+
+    if (urlToken) {
+        console.log("Token retrieved from URL:", urlToken);
+        localStorage.setItem("token", urlToken); // Store token
+        token = urlToken; // Use the new token
+    } 
+
+    console.log("Stored Token:", token);
+
+    const profileBox = document.getElementById("profile-box");
+    const notificationBell = document.getElementById("notification-bell");
+    const dropdownBox = document.getElementById("drop-box");
+    const loginButton = document.getElementById("btn-box");
+    const notificationDetailBox = document.getElementById("notification-detail-box");
+
+    if (token) {
+      // User is logged in
+      profileBox.style.display = "flex";
+      notificationBell.style.display = "flex";
+      loginButton.style.display = "none"; // Hide login button
+
+      dropdownBox.style.display = "none";
+
+      profileBox.addEventListener("click", () => {
+        dropdownBox.style.display = dropdownBox.style.display === "none" ? "flex" : "none";
+      });
+
+      // Fetch notifications using the stored token
+      fetch("/api/buyer/notifications", {
+        method: "GET",
+        headers: { "Authorization": `Bearer ${token}` }
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.length > 0) {
+          notificationDetailBox.innerHTML = data.map(notification => `
+            <li class="notification">
+              <div class="notification-upper notification-slot">
+                <h3>${notification.job_role}</h3>
+                <div class="company-logo-box">
+                  <img src="/public/ASSETS/IMAGES/company_logos/${notification.company}.png" alt="company-logo">
+                </div>
+              </div>
+              <div class="notification-lower notification-slot">
+                <p><span>Status:</span> ${notification.application_status}</p>
+                <a href="#" onclick="deleteNotification('${notification.job_id}')"><i class="fa-solid fa-trash"></i></a>
+              </div>
+            </li>
+          `).join('');
+        } else {
+          notificationDetailBox.innerHTML = `<h3 class="no-notification">No notifications yet</h3>`;
+        }
+      });
+    } else {
+      // User is not logged in
+      profileBox.style.display = "none";
+      notificationBell.style.display = "none";
+      dropdownBox.style.display = "none";
+      loginButton.style.display = "block"; // Show login button
+    }
+  });
+
+  // Logout function
+  function logout() {
+    localStorage.removeItem("token"); // Remove token
+    window.location.href = "/api/auth/login"; // Redirect to login
+  }
+
+  // Delete notification function
+  function deleteNotification(jobId) {
+    fetch(`/api/buyer/delete-notification?jobid=${jobId}`, {
+      method: "DELETE",
+      headers: { "Authorization": `Bearer ${localStorage.getItem("token")}` }
+    }).then(() => {
+      location.reload(); // Refresh notifications
+    });
+  }
+</script>
+
 <body>
   
   <!-- header section  -->
   <header>
     <div id="header-box">
-      <div class="header-container" id="header">       
-      </div>
-
-      <% if(isLogged != null && isLogged == true) { %>
-      <div class="profile-box">
+      <div class="header-container" id="header"></div>
+  
+      <div class="profile-box" id="profile-box">
         <div class="notification-box" id="notification-bell">
           <i class="fa-solid fa-bell"></i>
-          
-          <% if(notiResult.length > 0){ %>
-          <div class="notification-indicator"></div>
-          <% } %>
+          <div class="notification-indicator" style="display: none;"></div>
         </div>
+        
         <div class="profile-pic-div" id="profile-div">
           <% if(profilePic == null){ %>
             <img src="/PUBLIC/ASSETS/IMAGES/user.png" alt="profile-picture">
@@ -40,55 +123,21 @@
           <% } %>
         </div>
       </div>
-
+  
       <div class="dropdown-box hidden" id="drop-box">
         <ul>
-          <li><a href="/api/auth/edit-profile">Edit Profile</a></li>
-          <li><a href="/api/auth/change-password">Change Password</a></li>
-          <li class="logout-btn"><a href="/api/auth/logout">Logout <i class="fa-solid fa-right-from-bracket"></i></a></li>
+          <li><a href="/api/buyer/edit-profile">Edit Profile</a></li>
+          <li><a href="/api/buyer/change-password">Change Password</a></li>
+          <li class="logout-btn"><a href="#" onclick="logout()">Logout <i class="fa-solid fa-right-from-bracket"></i></a></li>
         </ul>
       </div>
-
-      <!-- notification area -->
-      <div class="notification-detail-box hidden" id="notification-detail-box">
-        
-        <%if(notiResult.length > 0){%>
-        
-        <ul>
-
-          <% notiResult.forEach(notification =>{ %>
-            <li class="notification">
-              <div class="notification-upper notification-slot">
-                <h3><%= notification.job_role %></h3>
-                <div class="company-logo-box">
-                  <img src="/PUBLIC/ASSETS/IMAGES/company_logos/<%= notification.company %>.png" alt="company-logo">
-                </div>
-              </div>
-              <div class="notification-lower notification-slot">
-                <p><span>Status:</span> <%= notification.application_status %></p>
-                <a href="/api/buyer/delete-notification?jobid=<%= notification.job_id %>"><i class="fa-solid fa-trash"></i></a>
-              </div>
-          </li>
-          <%})%>
-          
-        </ul>
-
-        <% }else{ %>
-          <h3 class="no-notification">No notifications yet</h3>
-        <% } %>
+  
+      <div class="notification-detail-box hidden" id="notification-detail-box"></div>
+  
+      <div class="button-box" id="btn-box">
+        <a class='myBtn' href="/api/auth/login">Login</a>
       </div>
-      <!-- notification area -->
-
-      <% } else { %>
-        <div class="button-box" id="btn-box">
-          <a class='myBtn' href="/api/auth/login">Login</a>
-        </div>
-      <% } %>
-      
     </div>
-
-    
-
   </header>
   <!-- header section ends here -->
 
@@ -145,7 +194,8 @@
 
       const fetchJobList = () => {
         axios.get("http://localhost:5000/api/buyer/jobs", {
-          headers: { Authorization: `Bearer ${yourToken}` }
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+          withCredentials: true
         }).then((response) => {
             setJobList(response.data.rows);
           }).catch((error) => {
@@ -164,7 +214,8 @@
         };
 
         axios.post('http://localhost:5000/api/buyer/filters', {
-          headers: { Authorization: `Bearer ${yourToken}` }
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+          withCredentials: true
         }, filters)
           .then(response => {
             setJobList(response.data.rows);
@@ -392,8 +443,6 @@
               ))}
             </div> )
               }
-
-             
             
             </div>
 
