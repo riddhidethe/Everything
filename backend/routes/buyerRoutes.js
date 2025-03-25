@@ -42,7 +42,9 @@ router.get("/products", async (req, res) => {
 router.post("/buy-product/:id", authMiddleware(["buyer", "applicant"]), async (req, res) => {
     try {
         const product = await Product.findById(req.params.id);
-        if (!product || product.status !== "available") return res.status(404).json({ msg: "Product not available" });
+        if (!product || product.status !== "available") {
+            return res.status(404).json({ msg: "Product not available" });
+        }
 
         product.status = "pending";
         await product.save();
@@ -67,30 +69,62 @@ router.get("/my-orders", authMiddleware(["buyer", "applicant"]), async (req, res
 });
 
 // 📌 Apply for a job
+// router.post("/apply-job", authMiddleware(["buyer", "applicant"]), async (req, res) => {
+//     try {
+//         const { jobId, skills, experience, resume } = req.body;
+//         const job = await Job.findById(jobId);
+
+//         if (!job) return res.status(404).json({ msg: "Job not found" });
+
+//         // Create current date in YYYY-MM-DD format
+//         const today = new Date();
+//         const appliedDate = today.toISOString().split('T')[0];
+
+//         const application = new Application({ 
+//             userId: req.user.id, 
+//             jobId, 
+//             skills, 
+//             experience, 
+//             resume, 
+//             status: "pending",
+//             appliedDate,
+//             isViewed: 1,
+//             isSaved: 0
+//         });
+//         await application.save();
+
+//         res.json({ msg: "Job application submitted successfully", application });
+//     } catch (error) {
+//         res.status(500).json({ msg: "Server error", error });
+//     }
+// });
+
 router.post("/apply-job", authMiddleware(["buyer", "applicant"]), async (req, res) => {
     try {
         const { jobId, skills, experience, resume } = req.body;
-        const job = await Job.findById(jobId);
+        if (!jobId || !skills || !experience || !resume) {
+            return res.status(400).json({ msg: "Missing required fields" });
+        }
 
+        const job = await Job.findById(jobId);
         if (!job) return res.status(404).json({ msg: "Job not found" });
 
-        // Create current date in YYYY-MM-DD format
         const today = new Date();
-        const appliedDate = today.toISOString().split('T')[0];
+        const appliedDate = today.toISOString().split("T")[0];
 
-        const application = new Application({ 
-            userId: req.user.id, 
-            jobId, 
-            skills, 
-            experience, 
-            resume, 
+        const application = new Application({
+            userId: req.user.id,
+            jobId,
+            skills,
+            experience,
+            resume,
             status: "pending",
             appliedDate,
             isViewed: 1,
-            isSaved: 0
+            isSaved: 0,
         });
-        await application.save();
 
+        await application.save();
         res.json({ msg: "Job application submitted successfully", application });
     } catch (error) {
         res.status(500).json({ msg: "Server error", error });
@@ -112,9 +146,14 @@ router.get("/my-applications", authMiddleware(["buyer", "applicant"]), async (re
 // 📌 Get home page data
 router.get("/home", authMiddleware(["buyer", "applicant"]), async (req, res) => {
     try {
+        console.log("Session in /home:", req.session);
+        console.log("User from middleware:", req.user);
+
         const user = await User.findById(req.user.id);
         if (!user) return res.status(404).json({ msg: "User not found" });
         
+        console.log("User found:", user);
+
         // Get top 6 jobs by application count
         const topJobs = await Application.aggregate([
             { $group: { _id: "$jobId", applicationCount: { $sum: 1 } } },
@@ -122,23 +161,33 @@ router.get("/home", authMiddleware(["buyer", "applicant"]), async (req, res) => 
             { $limit: 6 }
         ]);
         
+        console.log("Top Jobs:", topJobs);
+
         const topJobIds = topJobs.map(job => job._id);
         const popularJobs = await Job.find({ _id: { $in: topJobIds } });
         
+        console.log("Popular Jobs:", popularJobs);
+
         // Get notifications
         const notifications = await Application.find({
             userId: req.user.id,
             isViewed: 1,
             status: { $ne: "pending" }
         }).populate("jobId");
+
+        console.log("Notifications:", notifications);
         
-        res.json({ 
-            user, 
-            popularJobs, 
-            notifications,
-            profilePic: user.profilePicCode
+        // ✅ Render the `applicant_homepage.ejs` file with necessary data
+        res.render("applicant/applicant_homepage", {
+            userId: user._id,
+            profilePic: user.profilePic,
+            isLogged: true,  // Since user is authenticated
+            r2: popularJobs,
+            notifications
         });
+
     } catch (error) {
+        console.error("Error loading applicant homepage:", error);
         res.status(500).json({ msg: "Server error", error });
     }
 });

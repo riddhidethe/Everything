@@ -519,41 +519,56 @@ const express = require("express");
 const bcrypt = require("bcryptjs");
 const session = require("express-session");
 const mongoose = require("mongoose");
-const MongoStore = require("connect-mongo");
+const MongoDBStore = require("connect-mongo");
 const User = require("../models/User");
 const Seller = require("../models/Seller");
 const Recruiter = require("../models/Recruiter");
 const Admin = require("../models/Admin");
 const sendMail = require("../../FUNCTION/mailSetup");
+const authMiddleware = require("../middleware/authMiddleware")
 
 const router = express.Router();
 
-// Session setup
-router.use(
-    session({
-        secret: "YOUR_SECRET_KEY",
-        resave: false,
-        saveUninitialized: false,
-        store: MongoStore.create({ mongoUrl: "mongodb://localhost:27017/EverythingStore" }),
-        cookie: { maxAge: 1000 * 60 * 60 * 24 }, // 1 day
-    })
-);
+// const store = new MongoDBStore({
+//     uri: "mongodb://localhost:27017/yourDB",
+//     collection: "sessions"
+// });
+// // Session setup
+// router.use(session({
+//     secret: "your_secret_key",
+//     resave: false,
+//     saveUninitialized: false,
+//     store: store,  // Persistent session storage
+//     cookie: { secure: false }  // Set to true if using HTTPS
+// }));
 
 // Middleware to check session authentication
-const authMiddleware = (req, res, next) => {
-    if (req.session.user) {
-        return next();
-    } else {
-        return res.status(401).json({ msg: "Unauthorized" });
-    }
-};
+// const authMiddleware = (req, res, next) => {
+//     if (req.session.user) {
+//         return next();
+//     } else {
+//         return res.status(401).json({ msg: "Unauthorized" });
+//     }
+// };
 
 // Check authentication
 router.get("/check-auth", authMiddleware, (req, res) => {
-    res.status(200).json({ 
-        isAuthenticated: true,
-        user: req.session.user
-    });
+    if (req.user) {
+        return res.json({
+            isAuthenticated: true,
+            user: {
+                id: req.user.id,
+                profilePic: req.user.profilePic || null
+            }
+        });
+    } else {
+        return res.json({ isAuthenticated: false });
+    }
+});
+
+
+router.get('/register', (req, res) => {
+    res.render('Form/applicant_registration', { errorMsg: null });
 });
 
 // Register a new user
@@ -569,6 +584,7 @@ router.post("/register", async (req, res) => {
                               await Seller.findOne({ email }) || 
                               await Recruiter.findOne({ email }) ||
                               await Admin.findOne({ email });
+
         if (existingUser) {
             return res.status(400).json({ msg: "Email already exists" });
         }
@@ -581,17 +597,30 @@ router.post("/register", async (req, res) => {
         else user = new User({ name, email, password: hashedPassword, isActive: true });
         
         await user.save();
-        res.json({ msg: "User registered successfully!" });
+        //If applicant, redirect to complete profile form
+        if (role === "applicant") {
+            // Create session or token for form completion
+            return res.render('form/complete_form', { msg: "Registration started" });
+        }
+        
+        res.redirect('/api/auth/login');
+        // res.json({ msg: "User registered successfully!" });
     } catch (error) {
         console.error(error);
         res.status(500).json({ msg: "Server error" });
     }
 });
 
+// route to open the login form
+router.get('/login', (req, res) => {
+    res.render('form/login_via_password', { errorMsg: null, display: null });
+});
+
 // Login
 router.post("/login", async (req, res) => {
+    const { email, password } = req.body;
     try {
-        const { email, password } = req.body;
+        console.log("Session Data:", req.session);        
         
         let user = await User.findOne({ email }) || 
                     await Seller.findOne({ email }) || 
@@ -603,16 +632,35 @@ router.post("/login", async (req, res) => {
         if (!isMatch) return res.status(400).json({ msg: "Invalid credentials" });
 
         req.session.user = {
-            id: user._id,
+            id: user._id.toString(),
             role: user.role,
             profilePic: user.profile_pic_code
         };
-        res.redirect(`/applicant/applicant_homepage?userId=${user._id}?`);
+
+
+        // Save session explicitly before redirecting
+        req.session.save((err) => {
+            if (err) {
+                console.error("Session Save Error:", err);
+                return res.status(500).json({ msg: "Session error" });
+            }
+
+            console.log("Session After Login:", req.session);
+
+            res.json({ success: true, userId: user._id, redirectUrl: getRedirectUrl(user.role, user._id),  profilePic: profilePic});
+        });
     } catch (error) {
         console.error(error);
         res.status(500).json({ msg: "Server error" });
     }
 });
+
+// Function to get redirect URL based on role
+function getRedirectUrl(role, userId) {
+    if (role === "seller") return `/seller/dashboard?userId=${userId}`;
+    if (role === "recruiter") return `/recruiter/dashboard?userId=${userId}`;
+    return `/api/buyer/home?userId=${userId}`;
+}
 
 // Logout
 router.post("/logout", (req, res) => {
@@ -620,7 +668,7 @@ router.post("/logout", (req, res) => {
         if (err) {
             return res.status(500).json({ msg: "Error logging out" });
         }
-        res.json({ msg: "Logged out successfully" });
+        res.redirect("/homepage");
     });
 });
 

@@ -7,7 +7,10 @@ const UserSchema = new mongoose.Schema({
     email: { type: String, unique: true, required: true },
     password: { type: String, required: true },
     role: { type: String, enum: ["buyer"], default: "buyer" }, // Default role is buyer
-
+    
+    // Profile picture field (newly added)
+    profilePic: { type: String, default: "user.png" },
+    
     // Applicant fields (only required if applying for jobs)
     skills: { type: [String], default: [] },
     experience: { type: String, default: "" },

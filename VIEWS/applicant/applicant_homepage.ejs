@@ -26,122 +26,171 @@
   </head>
 
   <script>
-    document.addEventListener("DOMContentLoaded", () => {
-  // Get all the relevant elements
-  const profileBox = document.getElementById("profile-box");
-  const profileDiv = document.getElementById("profile-div"); // The profile picture container
-  const notificationBell = document.getElementById("notification-bell");
-  const dropdownBox = document.getElementById("drop-box");
-  const loginButton = document.getElementById("btn-box");
-  const notificationDetailBox = document.getElementById("notification-detail-box");
-  
-  // Hide profile elements by default
-  profileBox.style.display = "none";
-  notificationBell.style.display = "none";
-  
-  // Show login button by default
-  loginButton.style.display = "flex";
-  
-  // Make authentication check
-  fetch("/api/auth/check-auth", {
-    method: "GET",
-    credentials: "include"
-  })
-  .then(response => {
-    if (response.ok) {
-      // User is logged in - show profile elements and hide login
-      profileBox.style.display = "flex";
-      notificationBell.style.display = "flex"; 
-      loginButton.style.display = "none";
-      
-      // Event listener for profile dropdown
-      profileBox.addEventListener("click", () => {
-        dropdownBox.style.display = dropdownBox.style.display === "none" ? "flex" : "none";
-      });
+    document.addEventListener("DOMContentLoaded", async function() {
+      const profileBox = document.getElementById("profile-box");
+      const profileDiv = document.getElementById("profile-div");
+      const notificationBell = document.getElementById("notification-bell");
+      const dropdownBox = document.getElementById("drop-box");
+      const loginButton = document.getElementById("btn-box");
+      const notificationDetailBox = document.getElementById("notification-detail-box");
 
-      // Fetch notifications - cookie is sent automatically
-      fetch("/api/buyer/notifications", {
-        method: "GET",
-        credentials: "include"
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.length > 0) {
-          notificationDetailBox.innerHTML = data.map(notification => `
-            <li class="notification">
-              <div class="notification-upper notification-slot">
-                <h3>${notification.job_role}</h3>
-                <div class="company-logo-box">
-                  <img src="/public/ASSETS/IMAGES/company_logos/${notification.company}.png" alt="company-logo">
-                </div>
-              </div>
-              <div class="notification-lower notification-slot">
-                <p><span>Status:</span> ${notification.application_status}</p>
-                <a href="#" onclick="deleteNotification('${notification.job_id}')"><i class="fa-solid fa-trash"></i></a>
-              </div>
-            </li>
-          `).join('');
-        } else {
-          notificationDetailBox.innerHTML = `<h3 class="no-notification">No notifications yet</h3>`;
-        }
-      });
-    } else {
-      // User is not logged in - keep profile hidden and show login button
-      profileBox.style.display = "none";
-      notificationBell.style.display = "none";
-      dropdownBox.style.display = "none";
-      loginButton.style.display = "block";
-    }
-  })
-  .catch(error => {
-    console.error("Error checking authentication:", error);
-    // Default to not logged in if there's an error
-    profileBox.style.display = "none";
-    notificationBell.style.display = "none";
-    dropdownBox.style.display = "none";
-    loginButton.style.display = "block";
-  });
-});
+      if (isLogged) {  
+          profileBox.style.display = "flex";  
+          profileDiv.style.display = "block"; // Ensure it's visible  
+          notificationBell.style.display = "block";  
+          loginButton.style.display = "none"; // Hide login button after login  
+      } else {  
+          profileBox.style.display = "flex";  
+          profileDiv.style.display = "none";  
+          notificationBell.style.display = "none";  
+          loginButton.style.display = "flex";  
+      }
 
-// Updated logout function
-const handleLogout = async () => {
-    try {
-        // Call the backend logout route
-        await fetch("http://your-backend-url/api/auth/logout", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
+      try {
+        const response = await fetch("/api/auth/check-auth", {
+          method: "GET",
+          credentials: "include"
         });
 
-        // Remove JWT token from localStorage or sessionStorage
-        localStorage.removeItem("token");  
-        localStorage.removeItem("userId"); 
+        const userData = await response.json();
+        console.log("Auth Check Response:", userData); // Debugging response
 
-        // Redirect to the homepage
+        // Ensure userData exists before checking properties
+        if (userData && userData.isAuthenticated) {
+          console.log("User is authenticated:", userData.user);
+
+          // // Show profile picture if available
+          // if (userData.user && userData.user.profilePic) {
+          //   profileDiv.innerHTML = `<img src="/PUBLIC/ASSETS/UPLOADS/profile_images/${userData.user.profilePic}" alt="profile-picture">`;
+          // } else {
+          //   profileDiv.innerHTML = `<img src="/PUBLIC/ASSETS/IMAGES/user.png" alt="profile-picture">`;
+          // }
+
+          // Show profile elements
+          profileDiv.style.display = "flex";
+          notificationBell.style.display = "flex";
+          loginButton.style.display = "none"; // Hide login button if user is logged in
+
+          profileBox.addEventListener("click", () => {
+            dropdownBox.style.display = dropdownBox.style.display === "none" ? "flex" : "none";
+          });
+
+          // Fetch notifications
+          const notificationResponse = await fetch("/api/buyer/notifications", {
+            method: "GET",
+            credentials: "include"
+          });
+
+          const notifications = await notificationResponse.json();
+          if (notifications.length > 0) {
+            notificationDetailBox.innerHTML = notifications.map(notification => `
+              <li class="notification">
+                <div class="notification-upper notification-slot">
+                  <h3>${notification.job_role}</h3>
+                  <div class="company-logo-box">
+                    <img src="/public/ASSETS/IMAGES/company_logos/${notification.company}.png" alt="company-logo">
+                  </div>
+                </div>
+                <div class="notification-lower notification-slot">
+                  <p><span>Status:</span> ${notification.application_status}</p>
+                  <a href="#" onclick="deleteNotification('${notification.job_id}')"><i class="fa-solid fa-trash"></i></a>
+                </div>
+              </li>
+            `).join('');
+          } else {
+            notificationDetailBox.innerHTML = `<h3 class="no-notification">No notifications yet</h3>`;
+          }
+        } else {
+          profileDiv.style.display = "none";
+          notificationBell.style.display = "none";
+          dropdownBox.style.display = "none";
+          loginButton.style.display = "flex"; // Ensure login button is displayed
+        }
+      } catch (error) {
+        console.error("Error checking authentication:", error);
+        profileDiv.style.display = "none";
+        notificationBell.style.display = "none";
+        dropdownBox.style.display = "none";
+        loginButton.style.display = "flex"; // Ensure login button is displayed even if an error occurs
+      }
+    });
+
+    async function handleLogout() {
+      try {
+        await fetch("/api/auth/logout", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+        });
+
         window.location.href = "/homepage";
-    } catch (error) {
+      } catch (error) {
         console.error("Logout failed", error);
+      }
     }
-};
 
+    function deleteNotification(jobId) {
+      fetch(`/api/buyer/delete-notification?jobid=${jobId}`, {
+        method: "DELETE",
+        credentials: "include"
+      }).then(() => {
+        location.reload();
+      });
+    }
+</script> 
 
-// Updated delete notification function
-function deleteNotification(jobId) {
-  fetch(`/api/buyer/delete-notification?jobid=${jobId}`, {
-    method: "DELETE",
-    credentials: "include"
-  }).then(() => {
-    location.reload();
-  });
-}
-  </script>
-  
-    
+<!-- <script>
+  document.addEventListener("DOMContentLoaded", async function () {
+    const profileBox = document.getElementById("profile-box");
+    const profileDiv = document.getElementById("profile-div");
+    const notificationBell = document.getElementById("notification-bell");
+    const dropdownBox = document.getElementById("drop-box");
+    const loginButton = document.getElementById("btn-box");
+    const notificationDetailBox = document.getElementById("notification-detail-box");
+
+    profileBox.style.display = "flex";
+    profileDiv.style.display = "none";
+    notificationBell.style.display = "none";
+    loginButton.style.display = "flex";
+
+    try {
+        const response = await fetch("/api/auth/check-auth", {
+            method: "GET",
+            credentials: "include"
+        });
+
+        const userData = await response.json();
+        console.log("Auth Response:", userData); // Debugging
+
+        if (userData.isAuthenticated) {
+            console.log("User is authenticated:", userData.user);
+
+            profileDiv.innerHTML = userData.user.profilePic
+                ? `<img src="/PUBLIC/ASSETS/UPLOADS/profile_images/${userData.user.profilePic}" alt="profile-picture">`
+                : `<img src="/PUBLIC/ASSETS/IMAGES/user.png" alt="profile-picture">`;
+
+            profileDiv.style.display = "flex";
+            notificationBell.style.display = "flex";
+            loginButton.style.display = "none";
+
+            profileBox.addEventListener("click", () => {
+                dropdownBox.style.display = dropdownBox.style.display === "none" ? "flex" : "none";
+            });
+        } else {
+            console.warn("User is NOT authenticated.");
+            loginButton.style.display = "flex"; // ✅ Ensure Login Button is Displayed
+        }
+    } catch (error) {
+        console.error("Auth Check Failed:", error);
+        loginButton.style.display = "flex"; // ✅ Ensure Login Button is Displayed on Error
+    }
+});
+  </script> -->
   <body>
     <!-- header section  -->
     <header>
       <div id="header-box">
         <div class="header-container" id="header"></div>
-    
+        <% if (isLogged != null && isLogged == true) { %>
         <div class="profile-box" id="profile-box">
           <div class="notification-box" id="notification-bell">
             <i class="fa-solid fa-bell"></i>
@@ -149,13 +198,13 @@ function deleteNotification(jobId) {
           </div>
           
           <div class="profile-pic-div" id="profile-div">
-            <% if(profilePic == null){ %>
+            <% if (typeof profilePic === 'undefined' || profilePic == null || profilePic === '') { %>
               <img src="/PUBLIC/ASSETS/IMAGES/user.png" alt="profile-picture">
-            <% }else{ %>
-            <img src="/PUBLIC/ASSETS/UPLOADS/profile_images/<%= profilePic %>" alt="profile-picture">
+            <% } else { %>
+              <img src="/PUBLIC/ASSETS/UPLOADS/profile_images/<%= profilePic %>" alt="profile-picture">
             <% } %>
           </div>
-        </div>
+          
     
         <div class="dropdown-box hidden" id="drop-box">
           <ul>
@@ -166,10 +215,11 @@ function deleteNotification(jobId) {
         </div>
     
         <div class="notification-detail-box hidden" id="notification-detail-box"></div>
-    
-        <div class="button-box" id="btn-box">
-          <a class='myBtn' href="/api/auth/login">Login</a>
-        </div>
+        <% } else { %>
+          <div class="button-box" id="btn-box">
+            <a class='myBtn' href="/api/auth/login">Login</a>
+          </div>
+        <% } %>
       </div>
     </header>
     <!-- header section ends here -->
@@ -236,28 +286,32 @@ function deleteNotification(jobId) {
           <p>Unlock Your Potential And Discover A World Of Opportunities That Align With Your Skills, Interests, And Aspirations</p>
         </div>
         <div class="popularJobsContent">
-          <% r2.forEach(job => { %>
-            <div class="popularJobCard">
-              <div class="othDetails1">
-                <div class="jobRole" style="color: #333; font-weight: 500;"><%= job.job_role %></div>
-                <!-- <div class="dueDate"><%= job.due_date %></div> -->
-              </div>
-              <div class="othDetails2">
-                <div class="loc"><%= job.city %></div>
-                <div class="jobType"><%= job.job_type %></div>
-              </div>
-              <div class="salary">Rs. <%= job.min_salary %>-<%= job.max_salary %></div>
-              <div class="jobDesc"><%= job.job_desc %></div>
-              <div class="othDetails3">
-                <div class="compImg">
-                  <img src="/public/ASSETS/IMAGES/company_logos/<%=job.company %>.png" alt="company logo">
+          <% if (r2 && r2.length > 0) { %>
+            <% r2.forEach(job => { %>
+              <div class="popularJobCard">
+                <div class="othDetails1">
+                  <div class="jobRole" style="color: #333; font-weight: 500;"><%= job.job_role %></div>
+                  <!-- <div class="dueDate"><%= job.due_date %></div> -->
                 </div>
-                <div class="moreDetailsbtn">
-                  <a href="/api/buyer/jobDetails?jobid=<%= job.job_id %>">View Details</a>
+                <div class="othDetails2">
+                  <div class="loc"><%= job.city %></div>
+                  <div class="jobType"><%= job.job_type %></div>
+                </div>
+                <div class="salary">Rs. <%= job.min_salary %>-<%= job.max_salary %></div>
+                <div class="jobDesc"><%= job.job_desc %></div>
+                <div class="othDetails3">
+                  <div class="compImg">
+                    <img src="/public/ASSETS/IMAGES/company_logos/<%=job.company %>.png" alt="company logo">
+                  </div>
+                  <div class="moreDetailsbtn">
+                    <a href="/api/buyer/jobDetails?jobid=<%= job.job_id %>">View Details</a>
+                  </div>
                 </div>
               </div>
-            </div>
-          <% }) %>
+            <% }) %>
+          <% } else { %>
+            <p>No popular jobs available at the moment.</p>  <!-- ✅ Display a message if no jobs -->
+          <% } %>
         </div>
         
 
@@ -305,9 +359,6 @@ function deleteNotification(jobId) {
     </section>
     <!-- hiring partners section ends  -->
 
-    <% if(toastNotification){ %>
-      <div id="toastBox"></div>
-    <% } %>
     
     <footer>
       <div class="footerContainer" id="footer"></div>
