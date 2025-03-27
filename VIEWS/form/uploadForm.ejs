@@ -19,16 +19,15 @@
                 <div class="formBox">
                     <form action="/api/buyer/upload-profile" method="post" enctype="multipart/form-data">
                         <!-- skill box start -->
-
                         <input type="hidden" name="applicant_id" value="<%= pd.applicant_id %>">
                         <input type="hidden" name="first_name" value="<%= pd.first_name %>">
                         <input type="hidden" name="last_name" value="<%= pd.last_name %>">
                         <input type="hidden" name="age" value="<%= pd.age %>">
                         <input type="hidden" name="mobile_no" value="<%= pd.mobile_no %>">
-                        <input type="hidden" name="email_id" value="<%= pd.email_id %>">
+                        <input type="hidden" name="email" value="<%= pd.email %>">
                         <input type="hidden" name="exp" value="<%= pd.exp %>">
                         <input type="hidden" name="gender" value="<%= pd.gender %>">
-                        <input type="hidden" name="profile_pic_code" value="<%= pd.profile_pic_code %>">
+                        <input type="hidden" name="profilePic" value="<%= pd.profilePic %>">
 
                     <div class="skill-wrapper">
                         <div class="skill-title">
@@ -47,11 +46,10 @@
                         </div>
                     </div>
                     <!-- skill box ends  -->
-
                     
                     <!-- upload cv section -->
                     <div class="upload-box" id="dropZone">
-                        <input type="file" id="fileInput" name="prof-pdf" accept=".pdf" hidden>
+                        <input type="file" id="fileInput" name="resume" accept=".pdf" hidden>
                         <div class="upload-content">
                             <span class="upload-icon" id="uploadIcon"><i class="fa-solid fa-file-arrow-up"></i></span>
                             <p id="uploadText">Drag & Drop or Click to choose File</p>

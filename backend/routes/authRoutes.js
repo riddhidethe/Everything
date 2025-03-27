@@ -557,7 +557,7 @@ router.get("/check-auth", authMiddleware, (req, res) => {
         return res.json({
             isAuthenticated: true,
             user: {
-                id: req.user.id,
+                id: req.user._id,
                 profilePic: req.user.profilePic || null
             }
         });
@@ -572,6 +572,45 @@ router.get('/register', (req, res) => {
 });
 
 // Register a new user
+// router.post("/register", async (req, res) => {
+//     try {
+//         const { name, email, password, confirmPassword, role } = req.body;
+        
+//         if (password !== confirmPassword) {
+//             return res.status(400).json({ msg: "Passwords do not match" });
+//         }
+        
+//         const existingUser = await User.findOne({ email }) || 
+//                               await Seller.findOne({ email }) || 
+//                               await Recruiter.findOne({ email }) ||
+//                               await Admin.findOne({ email });
+
+//         if (existingUser) {
+//             return res.status(400).json({ msg: "Email already exists" });
+//         }
+
+//         const hashedPassword = await bcrypt.hash(password, 10);
+//         let user;
+        
+//         if (role === "seller") user = new Seller({ name, email, password: hashedPassword, role, isActive: true});
+//         else if (role === "recruiter") user = new Recruiter({ name, email, password: hashedPassword, role, isActive: true});
+//         else user = new User({ name, email, password: hashedPassword, role, isActive: true });
+        
+//         await user.save();
+//         //If applicant, redirect to complete profile form
+//         if (role === "applicant") {
+//             // Create session or token for form completion
+//             return res.render('form/complete_form', { msg: "Registration started" });
+//         }
+        
+//         res.redirect('/api/auth/login');
+//         // res.json({ msg: "User registered successfully!" });
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).json({ msg: "Server error" });
+//     }
+// });
+
 router.post("/register", async (req, res) => {
     try {
         const { name, email, password, confirmPassword, role } = req.body;
@@ -592,19 +631,21 @@ router.post("/register", async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 10);
         let user;
         
-        if (role === "seller") user = new Seller({ name, email, password: hashedPassword });
-        else if (role === "recruiter") user = new Recruiter({ name, email, password: hashedPassword });
-        else user = new User({ name, email, password: hashedPassword, isActive: true });
-        
+        if (role === "seller") user = new Seller({ name, email, password: hashedPassword, role, isActive: true });
+        else if (role === "recruiter") user = new Recruiter({ name, email, password: hashedPassword, role, isActive: true });
+        else user = new User({ name, email, password: hashedPassword, role, isActive: true });
+
         await user.save();
-        //If applicant, redirect to complete profile form
+
+        // ✅ Store user in session
+        req.session.user = user;
+
+        // Redirect based on role
         if (role === "applicant") {
-            // Create session or token for form completion
             return res.render('form/complete_form', { msg: "Registration started" });
         }
         
-        res.redirect('/api/auth/login');
-        // res.json({ msg: "User registered successfully!" });
+        res.redirect('/api/auth/login'); 
     } catch (error) {
         console.error(error);
         res.status(500).json({ msg: "Server error" });
@@ -632,11 +673,10 @@ router.post("/login", async (req, res) => {
         if (!isMatch) return res.status(400).json({ msg: "Invalid credentials" });
 
         req.session.user = {
-            id: user._id.toString(),
+            id: user._id,
             role: user.role,
-            profilePic: user.profile_pic_code
+            profilePic: user.profilePic || "user.png"
         };
-
 
         // Save session explicitly before redirecting
         req.session.save((err) => {
@@ -644,11 +684,16 @@ router.post("/login", async (req, res) => {
                 console.error("Session Save Error:", err);
                 return res.status(500).json({ msg: "Session error" });
             }
-
-            console.log("Session After Login:", req.session);
-
-            res.json({ success: true, userId: user._id, redirectUrl: getRedirectUrl(user.role, user._id),  profilePic: profilePic});
+        
+            console.log("Session After Login:", req.session); // Check if session is updated
+            res.json({ 
+                success: true, 
+                userId: user._id, 
+                redirectUrl: getRedirectUrl(user.role, user._id),
+                profilePic: user.profilePic
+            });
         });
+        
     } catch (error) {
         console.error(error);
         res.status(500).json({ msg: "Server error" });

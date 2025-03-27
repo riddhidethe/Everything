@@ -8,8 +8,8 @@
     <meta name="description" content="Web site created using create-react-app" />
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-    <link rel="stylesheet" href="/PUBLIC/CSS/dashboard_style.css">
-    <link rel="stylesheet" href="/PUBLIC/CSS/applicant_style.css">
+    <link rel="stylesheet" href="/public/CSS/dashboard_style.css">
+    <link rel="stylesheet" href="/public/CSS/applicant_style.css">
     <script src="/function/Babel.js"></script>
     <script src="/function/React.js"></script>
     <script src="/function/ReactDOM.js"></script>
@@ -95,9 +95,9 @@
           </div>
           <div class="profile-pic-div" id="profile-div">
             <% if(profilePic == null){ %>
-              <img src="/PUBLIC/ASSETS/IMAGES/user.png" alt="profile-picture">
+              <img src="/public/ASSETS/IMAGES/user.png" alt="profile-picture">
             <% }else{ %>
-            <img src="/PUBLIC/ASSETS/UPLOADS/profile_images/<%= profilePic %>" alt="profile-picture">
+            <img src="/public/ASSETS/UPLOADS/profile_images/<%= profilePic %>" alt="profile-picture">
             <% } %>
           </div>
         </div>
@@ -120,7 +120,7 @@
                   <div class="notification-upper notification-slot">
                     <h3><%= notification.job_role %></h3>
                     <div class="company-logo-box">
-                      <img src="/PUBLIC/ASSETS/IMAGES/company_logos/<%= notification.company %>.png" alt="company-logo">
+                      <img src="/public/ASSETS/IMAGES/company_logos/<%= notification.company %>.png" alt="company-logo">
                     </div>
                   </div>
                   <div class="notification-lower notification-slot">
@@ -350,7 +350,7 @@
                   ))
                 ) : (
                   <div className="no-application">
-                    <img src="/PUBLIC/ASSETS/IMAGES/No data.png" alt="no-data" />
+                    <img src="/public/ASSETS/IMAGES/No data.png" alt="no-data" />
                     <h3>Not Applied For Any Jobs</h3>
                   </div>
                 )}
@@ -389,9 +389,9 @@
 
 
     <!-- Embed the data in a script tag -->
-    <script src="/PUBLIC/JS/script.js"></script>
-    <script type="text/babel" src="/PUBLIC/COMPONENTS/Footer.js"></script>
-    <script type="text/babel" src="/PUBLIC/COMPONENTS/Header.js"></script>
+    <script src="/public/JS/script.js"></script>
+    <script type="text/babel" src="/public/COMPONENTS/Footer.js"></script>
+    <script type="text/babel" src="/public/COMPONENTS/Header.js"></script>
     <script type="text/babel">
       ReactDOM.render(<Footer />, document.getElementById("footer"));
       ReactDOM.render(<Header />, document.getElementById("header"));

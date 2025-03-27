@@ -22,8 +22,7 @@
                     <form action="/api/profile/profileComplete" method="post" enctype="multipart/form-data">
                         <div class="profilepicbox">
                             <div class="profilePhoto" id="profilePhoto">
-                                <input type="hidden" name="token" value="<%= token %>">  <!-- Pass token here -->
-                                <input type="file" name="prof-image" id="fileInput" accept=".jpeg, .jpg" hidden>
+                                <input type="file" name="profilePic" id="fileInput" accept=".jpeg, .jpg" hidden>
                                 <span class="uploadText"><i class="fa-solid fa-circle-plus"></i>
                                     <p>Upload Photo</p>
                                 </span>
@@ -69,7 +68,15 @@
         fileInput = document.getElementById('fileInput'),
         uploadText = profilePhoto.querySelector('.uploadText');
 
-        profilePhoto.addEventListener('click', () => fileInput.click());
+        // profilePhoto.addEventListener('click', () => fileInput.click());
+        profilePhoto.addEventListener('click', () => {
+            fileInput.click();
+            fileInput.addEventListener('change', function () {
+                if (!fileInput.value) {
+                    alert('No file selected.');
+                }
+            });
+        });
 
         fileInput.addEventListener('change', handleFile);
 

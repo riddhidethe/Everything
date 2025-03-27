@@ -21,7 +21,7 @@ const app = express();
 
 // ✅ Apply Essential Middlewares BEFORE Routes
 app.use(cors({
-    origin: ["http://localhost:3000"], // ✅ Change to your frontend URL
+    origin: ["http://localhost:5000"], // ✅ Change to your frontend URL
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     credentials: true,
     allowedHeaders: ["Authorization", "Content-Type"], 
@@ -42,7 +42,7 @@ app.set('view engine', 'ejs');
 app.use(session({
     secret: "your-secret-key",  // Use a strong secret
     resave: false,  // Prevents unnecessary session saving
-    saveUninitialized: false,  // Avoids saving empty sessions
+    saveUninitialized: true,  // Avoids saving empty sessions
     store: MongoStore.create({ mongoUrl: process.env.MONGO_URI }),  // Persist sessions in MongoDB
     cookie: {
         httpOnly: true,
@@ -88,9 +88,9 @@ app.get('/homepage', async (req, res) => {
         r2 = popularJobs || []; // ✅ Prevent undefined error
 
         if (req.user) {
-            const userProfile = await User.findById(req.user.id).select('profilePic');
+            const userProfile = await User.findById(req.user._id).select('profilePic');
             profilePic = userProfile?.profilePic || null; // ✅ Assign value if exists
-            notiResult = await Notification.find({ userId: req.user.id });
+            notiResult = await Notification.find({ userId: req.user._id });
         }
 
         // ✅ Render Homepage

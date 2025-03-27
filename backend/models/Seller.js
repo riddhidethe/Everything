@@ -8,7 +8,7 @@ const SellerSchema = new mongoose.Schema({
     role: { type: String, enum: ["seller"], default: "seller" },
 
     // Profile picture field (newly added)
-    profilePic: { type: String, default: "user.png" },
+    profilePic: { type: String},
     
     // Seller Dashboard
     products: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],

@@ -11,37 +11,47 @@ const path = require('path');
 const router = express.Router();
 
 // 📌 Initial profile data submission
-router.post('/profileComplete', authMiddleware(["applicant"]), upload.single('prof-image'), async (req, res) => {
-    try {
-        console.log(req.body, req.file);
-        const userId = req.user.id;
-        const first_name = req.body.fname;
-        const last_name = req.body.lname;
-        const age = req.body.age;
-        const mobile_no = req.body.phoneno;
-        const exp = req.body.exp;
-        const gender = req.body.gender;
-        const profile_pic_code = req.file ? req.file.filename : null;
+router.post(
+    "/profileComplete",
+    authMiddleware(["applicant"]),
+    upload.fields([{ name: "profilePic", maxCount: 1 }]),
+    async (req, res) => {
+        try {
+            console.log("Session User:", req.session?.user); // Debugging
 
-        // Prepare data for the next step
-        const profileData = {
-            applicant_id: userId,
-            first_name: first_name,
-            last_name: last_name,
-            age: age,
-            mobile_no: mobile_no,
-            email_id: req.user.email,
-            exp: exp,
-            gender: gender,
-            profile_pic_code: profile_pic_code
-        };
-        console.log("Profile Data:", profileData);
-        res.render('form/uploadForm', { pd: profileData })
-    } catch (error) {
-        console.log(error);
-        res.status(500).json({ success: false, msg: "Server error", error });
+            if (!req.session?.user || !req.session?.user._id) {
+                return res.status(401).json({ msg: "Unauthorized: Session expired or user not found" });
+            }
+
+            if (!req.files || !req.files["profilePic"]) {
+                return res.status(400).json({ msg: "No profile image uploaded" });
+            }
+
+            const { fname, lname, age, phoneno, exp, gender } = req.body;
+            const profilePicPath = req.files["profilePic"][0].filename;
+
+            const profileData = {
+                applicant_id: req.session.user._id,
+                first_name: fname,
+                last_name: lname,
+                age: age,
+                mobile_no: phoneno,
+                email_id: req.session.user.email,
+                exp: exp,
+                gender: gender,
+                profile_pic_code: profilePicPath
+            };
+
+            console.log("Profile Data:", profileData);
+            
+            res.render("form/uploadForm", { pd: profileData });
+        } catch (error) {
+            console.error("Profile Complete Error:", error);
+            res.status(500).json({ msg: "Server error", error: error.message });
+        }
     }
-});
+);
+
 
 // 📌 Complete profile update with resume
 router.post('/updateProfile', authMiddleware(["applicant"]), 
@@ -51,7 +61,7 @@ router.post('/updateProfile', authMiddleware(["applicant"]),
     ]), 
     async (req, res) => {
         try {
-            const userId = req.user.id;
+            const userId = req.user._id;
             const {
                 first_name,
                 last_name,
@@ -111,7 +121,7 @@ router.post('/updateProfile', authMiddleware(["applicant"]),
 // 📌 Get user profile
 router.get('/profile', authMiddleware(["applicant"]), async (req, res) => {
     try {
-        const userId = req.user.id;
+        const userId = req.user._id;
         
         const user = await User.findById(userId);
         if (!user) {
@@ -130,7 +140,7 @@ router.get('/profile', authMiddleware(["applicant"]), async (req, res) => {
                 experienceLevel: user.experienceLevel,
                 gender: user.gender,
                 skills: user.skills,
-                profilePhoto: user.profilePhoto,
+                profilePic: user.profilePic,
                 resume: user.resume
             }
         });
@@ -142,7 +152,7 @@ router.get('/profile', authMiddleware(["applicant"]), async (req, res) => {
 // 📌 Update specific profile fields
 router.patch('/update-fields', authMiddleware(["applicant"]), async (req, res) => {
     try {
-        const userId = req.user.id;
+        const userId = req.user._id;
         const updates = req.body;
         
         // Remove any fields that shouldn't be directly updated
@@ -174,7 +184,7 @@ router.post('/update-profile-picture', authMiddleware(["applicant"]),
     upload.single('prof-image'), 
     async (req, res) => {
         try {
-            const userId = req.user.id;
+            const userId = req.user._id;
             
             if (!req.file) {
                 return res.status(400).json({ 
@@ -211,7 +221,7 @@ router.post('/update-resume', authMiddleware(["applicant"]),
     upload.single('prof-pdf'), 
     async (req, res) => {
         try {
-            const userId = req.user.id;
+            const userId = req.user._id;
             
             if (!req.file) {
                 return res.status(400).json({ 

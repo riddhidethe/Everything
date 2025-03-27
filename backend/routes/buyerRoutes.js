@@ -8,20 +8,21 @@ const User = require("../models/User"); // Added User model
 const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
+const upload = require("../../FUNCTION/uploadSetup")
 
-const router = express.Router();
+const router = express.Router(); 
 
 // Configure multer for file upload
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "public/uploads/profiles");
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + path.extname(file.originalname));
-  }
-});
+// const storage = multer.diskStorage({
+//   destination: function (req, file, cb) {
+//     cb(null, "public/uploads/profiles");
+//   },
+//   filename: function (req, file, cb) {
+//     cb(null, Date.now() + path.extname(file.originalname));
+//   }
+// });
 
-const upload = multer({ storage: storage });
+// const upload = multer({ storage: storage });
 
 // Protect this route with authMiddleware
 router.get("/protected-route", authMiddleware, (req, res) => {
@@ -49,7 +50,7 @@ router.post("/buy-product/:id", authMiddleware(["buyer", "applicant"]), async (r
         product.status = "pending";
         await product.save();
 
-        const order = new Order({ buyerId: req.user.id, productId: product._id });
+        const order = new Order({ buyerId: req.user._id, productId: product._id });
         await order.save();
 
         res.json({ msg: "Purchase request submitted", order });
@@ -61,7 +62,7 @@ router.post("/buy-product/:id", authMiddleware(["buyer", "applicant"]), async (r
 // 📌 Get all purchased products
 router.get("/my-orders", authMiddleware(["buyer", "applicant"]), async (req, res) => {
     try {
-        const orders = await Order.find({ buyerId: req.user.id }).populate("productId");
+        const orders = await Order.find({ buyerId: req.user._id }).populate("productId");
         res.json(orders);
     } catch (error) {
         res.status(500).json({ msg: "Server error", error });
@@ -113,7 +114,7 @@ router.post("/apply-job", authMiddleware(["buyer", "applicant"]), async (req, re
         const appliedDate = today.toISOString().split("T")[0];
 
         const application = new Application({
-            userId: req.user.id,
+            userId: req.user._id,
             jobId,
             skills,
             experience,
@@ -134,7 +135,7 @@ router.post("/apply-job", authMiddleware(["buyer", "applicant"]), async (req, re
 // 📌 Get all job applications
 router.get("/my-applications", authMiddleware(["buyer", "applicant"]), async (req, res) => {
     try {
-        const applications = await Application.find({ userId: req.user.id }).populate("jobId");
+        const applications = await Application.find({ userId: req.user._id }).populate("jobId");
         res.json(applications);
     } catch (error) {
         res.status(500).json({ msg: "Server error", error });
@@ -149,7 +150,7 @@ router.get("/home", authMiddleware(["buyer", "applicant"]), async (req, res) => 
         console.log("Session in /home:", req.session);
         console.log("User from middleware:", req.user);
 
-        const user = await User.findById(req.user.id);
+        const user = await User.findById(req.user._id);
         if (!user) return res.status(404).json({ msg: "User not found" });
         
         console.log("User found:", user);
@@ -170,7 +171,7 @@ router.get("/home", authMiddleware(["buyer", "applicant"]), async (req, res) => 
 
         // Get notifications
         const notifications = await Application.find({
-            userId: req.user.id,
+            userId: req.user._id,
             isViewed: 1,
             status: { $ne: "pending" }
         }).populate("jobId");
@@ -180,7 +181,7 @@ router.get("/home", authMiddleware(["buyer", "applicant"]), async (req, res) => 
         // ✅ Render the `applicant_homepage.ejs` file with necessary data
         res.render("applicant/applicant_homepage", {
             userId: user._id,
-            profilePic: user.profilePic,
+            profilePic: user.profilePic || "user.png",
             isLogged: true,  // Since user is authenticated
             r2: popularJobs,
             notifications
@@ -195,25 +196,36 @@ router.get("/home", authMiddleware(["buyer", "applicant"]), async (req, res) => 
 // 📌 Get job list
 router.get("/job-list", authMiddleware(["buyer", "applicant"]), async (req, res) => {
     try {
+        // Ensure user is authenticated and available
+        if (!req.user) {
+            return res.status(401).json({ msg: "Unauthorized: User not found" });
+        }
+
         // Get all jobs
         const jobs = await Job.find();
         
         // Get notifications
         const notifications = await Application.find({
-            userId: req.user.id,
+            userId: req.user._id,
             isViewed: 1,
             status: { $ne: "pending" }
         }).populate("jobId");
-        
-        res.json({ 
+
+        // Render the page
+        res.render("applicant/jobList", { 
+            userId: req.user._id,   // Use req.user instead of undefined user
+            profilePic: req.user.profilePic || "user.png",
+            isLogged: true,
             jobs, 
             notifications,
             toastNotification: req.query.toastNotification
         });
     } catch (error) {
+        console.error("Error in /job-list route:", error);
         res.status(500).json({ msg: "Server error", error });
     }
 });
+
 
 // 📌 Get all jobs
 router.get("/jobs", async (req, res) => {
@@ -270,14 +282,14 @@ router.get("/job-details/:id", authMiddleware(["buyer", "applicant"]), async (re
         
         // Get notifications
         const notifications = await Application.find({
-            userId: req.user.id,
+            userId: req.user._id,
             isViewed: 1,
             status: { $ne: "pending" }
         }).populate("jobId");
         
         // Check if user has applied for this job
         const hasApplied = await Application.exists({ 
-            userId: req.user.id,
+            userId: req.user._id,
             jobId: req.params.id
         });
         
@@ -296,7 +308,7 @@ router.get("/job-details/:id", authMiddleware(["buyer", "applicant"]), async (re
 router.get("/dashboard", authMiddleware(["buyer", "applicant"]), async (req, res) => {
     try {
         // Get user data
-        const user = await User.findById(req.user.id);
+        const user = await User.findById(req.user._id);
         if (!user) return res.status(404).json({ msg: "User not found" });
         
         // Parse skills if they exist
@@ -306,13 +318,13 @@ router.get("/dashboard", authMiddleware(["buyer", "applicant"]), async (req, res
         };
         
         // Get user's applications with job details
-        const applications = await Application.find({ userId: req.user.id })
+        const applications = await Application.find({ userId: req.user._id })
             .populate('jobId')
             .sort({ _id: -1 });
         
         // Get unique job roles from user's applications
         const uniqueJobs = await Application.aggregate([
-            { $match: { userId: req.user.id } },
+            { $match: { userId: req.user._id } },
             { $lookup: { from: 'jobs', localField: 'jobId', foreignField: '_id', as: 'jobDetails' } },
             { $unwind: '$jobDetails' },
             { $group: { _id: '$jobDetails.jobRole' } },
@@ -332,41 +344,62 @@ router.get("/dashboard", authMiddleware(["buyer", "applicant"]), async (req, res
 // 📌 Get applicant dashboard
 router.get("/applicant-dashboard", authMiddleware(["buyer", "applicant"]), async (req, res) => {
     try {
+        // Check if req.user exists
+        if (!req.user || !req.user._id) {
+            return res.status(401).json({ msg: "Unauthorized: User not found in session" });
+        }
+
+        console.log("User ID:", req.user._id); // Debugging
+
         // Get user data
-        const user = await User.findById(req.user.id);
-        if (!user) return res.status(404).json({ msg: "User not found" });
-        
-        // Parse skills if they exist
+        const user = await User.findById(req.user._id);
+        if (!user) {
+            return res.status(404).json({ msg: "User not found" });
+        }
+
+        console.log("Fetched User:", user); // Debugging
+
+        // Ensure skills is an array
         const userWithParsedSkills = {
             ...user.toObject(),
-            skills: user.skills ? user.skills.split(',') : []
+            skills: Array.isArray(user.skills) ? user.skills : []  // FIXED
         };
-        
+
+        console.log("Parsed User Data:", userWithParsedSkills); // Debugging
+
         // Get notifications
         const notifications = await Application.find({
-            userId: req.user.id,
+            userId: req.user._id,
             isViewed: 1,
             status: { $ne: "pending" }
         }).populate("jobId");
-        
-        res.json({
+
+        console.log("Notifications:", notifications); // Debugging
+
+        // Render the dashboard
+        res.render("applicant/applicant_dashboard", {
+            userId: req.user._id,
+            profilePic: user.profilePic || "user.png",
+            isLogged: true,
             user: userWithParsedSkills,
             notifications
         });
     } catch (error) {
-        res.status(500).json({ msg: "Server error", error });
+        console.error("Error in /applicant-dashboard:", error);
+        res.status(500).json({ msg: "Server error", error: error.message });
     }
 });
+
 
 // 📌 Get user profile for editing
 router.get("/edit-profile", authMiddleware(["buyer", "applicant"]), async (req, res) => {
     try {
-        const user = await User.findById(req.user.id);
+        const user = await User.findById(req.user._id);
         if (!user) return res.status(404).json({ msg: "User not found" });
         
         // Get notifications
         const notifications = await Application.find({
-            userId: req.user.id,
+            userId: req.user._id,
             isViewed: 1,
             status: { $ne: "pending" }
         }).populate("jobId");
@@ -384,7 +417,7 @@ router.get("/edit-profile", authMiddleware(["buyer", "applicant"]), async (req, 
 router.put("/delete-notification/:jobId", authMiddleware(["buyer", "applicant"]), async (req, res) => {
     try {
         await Application.findOneAndUpdate(
-            { userId: req.user.id, jobId: req.params.jobId },
+            { userId: req.user._id, jobId: req.params.jobId },
             { isViewed: 0 }
         );
         
@@ -397,11 +430,11 @@ router.put("/delete-notification/:jobId", authMiddleware(["buyer", "applicant"])
 // 📌 Delete profile picture
 router.delete("/delete-profile-pic", authMiddleware(["buyer", "applicant"]), async (req, res) => {
     try {
-        const user = await User.findById(req.user.id);
-        if (!user || !user.profilePicCode) return res.status(404).json({ msg: "No profile picture found" });
+        const user = await User.findById(req.user._id);
+        if (!user || !user.profilePic) return res.status(404).json({ msg: "No profile picture found" });
         
         // Delete file from filesystem
-        const filePath = path.join(__dirname, `../public/uploads/profile_images/${user.profilePicCode}`);
+        const filePath = path.join(__dirname, `../public/uploads/profile_images/${user.profilePic}`);
         fs.unlink(filePath, async (err) => {
             if (err) {
                 console.error(err);
@@ -409,7 +442,7 @@ router.delete("/delete-profile-pic", authMiddleware(["buyer", "applicant"]), asy
             }
             
             // Update user record
-            user.profilePicCode = null;
+            user.profilePic = null;
             await user.save();
             
             res.json({ msg: "Profile picture deleted successfully" });
@@ -419,53 +452,68 @@ router.delete("/delete-profile-pic", authMiddleware(["buyer", "applicant"]), asy
     }
 });
 
-// 📌 Upload user profile
-router.post("/upload-profile", authMiddleware(["buyer", "applicant"]), upload.single('prof-pdf'), async (req, res) => {
-    try {
-        if (!req.file) return res.status(400).json({ msg: "No file uploaded" });
-        
-        const { first_name, last_name, age, mobile_no, email_id, exp, gender, skills } = req.body;
-        
-        // Create or update profile
-        await User.findByIdAndUpdate(req.user.id, {
-            firstName: first_name,
-            lastName: last_name,
-            age,
-            mobileNo: mobile_no,
-            emailId: email_id,
-            experience: exp,
-            gender,
-            skills,
-            profilePicCode: req.file.filename,
-            resumeFileName: req.file.originalname
-        }, { new: true });
-        
-        res.json({ msg: "Profile updated successfully" });
-    } catch (error) {
-        res.status(500).json({ msg: "Server error", error });
-    }
-});
-
 // 📌 Update user profile
-router.put("/update-profile", authMiddleware(["buyer", "applicant"]), async (req, res) => {
-    try {
-        const { firstName, lastName, age, mobileNo, emailId, experience, gender, skills } = req.body;
-        
-        await User.findByIdAndUpdate(req.user.id, {
-            firstName,
-            lastName,
-            age,
-            mobileNo,
-            emailId,
-            experience,
-            gender,
-            skills
-        }, { new: true });
-        
-        res.json({ msg: "Profile updated successfully" });
-    } catch (error) {
-        res.status(500).json({ msg: "Server error", error });
+router.post(
+    "/upload-profile",
+    authMiddleware(["buyer", "applicant"]),
+    upload.fields([
+        { name: "profilePic", maxCount: 1 },
+        { name: "resume", maxCount: 1 }
+    ]),
+    async (req, res) => {
+        try {
+            console.log("Session User:", req.session.user); // Debugging
+
+            if (!req.session.user || !req.session.user._id) {
+                return res.redirect("/api/auth/login");
+            }
+
+            if (!req.files || (!req.files.profilePic && !req.files.resume)) {
+                return res.status(400).json({ msg: "No files uploaded" });
+            }
+
+            const { first_name, last_name, age, mobile_no, email, exp, gender, skills } = req.body;
+
+            const profilePic = req.files.profilePic ? req.files.profilePic[0].filename : null;
+            const resumePath = req.files.resume ? req.files.resume[0].filename : null;
+
+            const updatedUser = await User.findOneAndUpdate(
+                { _id: req.session.user._id }, // ✅ Fixed
+                {
+                    firstName: first_name,
+                    lastName: last_name,
+                    age,
+                    mobileNo: mobile_no,
+                    emailId: email,
+                    exp: exp,
+                    gender,
+                    skills,
+                    ...(profilePic && { profilePic: profilePic }),
+                    ...(resumePath && { resumeFileName: resumePath })
+                },
+                { new: true, runValidators: true }
+            );
+
+            if (!updatedUser) {
+                return res.status(404).json({ msg: "User not found" });
+            }
+
+            console.log("Profile updated successfully");
+
+            // Destroy session and redirect to login
+            req.session.destroy((err) => {
+                if (err) {
+                    console.error("Session Destroy Error:", err);
+                    return res.status(500).json({ msg: "Server error" });
+                }
+                res.redirect("/api/auth/login"); // Redirecting to the login page
+            });
+        } catch (error) {
+            console.error("Profile Update Error:", error);
+            res.status(500).json({ msg: "Server error", error: error.message });
+        }
     }
-});
+);
+
 
 module.exports = router;

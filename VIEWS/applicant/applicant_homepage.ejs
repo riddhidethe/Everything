@@ -138,53 +138,6 @@
     }
 </script> 
 
-<!-- <script>
-  document.addEventListener("DOMContentLoaded", async function () {
-    const profileBox = document.getElementById("profile-box");
-    const profileDiv = document.getElementById("profile-div");
-    const notificationBell = document.getElementById("notification-bell");
-    const dropdownBox = document.getElementById("drop-box");
-    const loginButton = document.getElementById("btn-box");
-    const notificationDetailBox = document.getElementById("notification-detail-box");
-
-    profileBox.style.display = "flex";
-    profileDiv.style.display = "none";
-    notificationBell.style.display = "none";
-    loginButton.style.display = "flex";
-
-    try {
-        const response = await fetch("/api/auth/check-auth", {
-            method: "GET",
-            credentials: "include"
-        });
-
-        const userData = await response.json();
-        console.log("Auth Response:", userData); // Debugging
-
-        if (userData.isAuthenticated) {
-            console.log("User is authenticated:", userData.user);
-
-            profileDiv.innerHTML = userData.user.profilePic
-                ? `<img src="/PUBLIC/ASSETS/UPLOADS/profile_images/${userData.user.profilePic}" alt="profile-picture">`
-                : `<img src="/PUBLIC/ASSETS/IMAGES/user.png" alt="profile-picture">`;
-
-            profileDiv.style.display = "flex";
-            notificationBell.style.display = "flex";
-            loginButton.style.display = "none";
-
-            profileBox.addEventListener("click", () => {
-                dropdownBox.style.display = dropdownBox.style.display === "none" ? "flex" : "none";
-            });
-        } else {
-            console.warn("User is NOT authenticated.");
-            loginButton.style.display = "flex"; // ✅ Ensure Login Button is Displayed
-        }
-    } catch (error) {
-        console.error("Auth Check Failed:", error);
-        loginButton.style.display = "flex"; // ✅ Ensure Login Button is Displayed on Error
-    }
-});
-  </script> -->
   <body>
     <!-- header section  -->
     <header>
@@ -199,9 +152,9 @@
           
           <div class="profile-pic-div" id="profile-div">
             <% if (typeof profilePic === 'undefined' || profilePic == null || profilePic === '') { %>
-              <img src="/PUBLIC/ASSETS/IMAGES/user.png" alt="profile-picture">
+              <img src="/public/ASSETS/IMAGES/user.png" alt="profile-picture">
             <% } else { %>
-              <img src="/PUBLIC/ASSETS/UPLOADS/profile_images/<%= profilePic %>" alt="profile-picture">
+              <img src="/public/ASSETS/UPLOADS/profile_images/<%= profilePic %>" alt="profile-picture">
             <% } %>
           </div>
           

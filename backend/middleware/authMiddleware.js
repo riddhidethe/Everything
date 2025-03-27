@@ -18,6 +18,10 @@ const authMiddleware = (roles = []) => async (req, res, next) => {
 
         const userId = req.session.user.id; // Use "id" instead of "userId"
 
+        if (!userId) {
+            return res.status(400).json({ msg: "User ID is missing from session." });
+        }
+        
         // Validate userId format
         if (!userId.match(/^[0-9a-fA-F]{24}$/)) {
             return res.status(400).json({ msg: "Invalid user ID format." });

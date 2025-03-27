@@ -8,7 +8,7 @@ const RecruiterSchema = new mongoose.Schema({
     role: { type: String, enum: ["recruiter"], default: "recruiter" },
 
     // Profile picture field (newly added)
-    profilePic: { type: String, default: "user.png" },
+    profilePic: { type: String },
     // Recruiter Dashboard
     jobsPosted: [{ type: mongoose.Schema.Types.ObjectId, ref: "Job" }],
     applicationsReceived: [{ type: mongoose.Schema.Types.ObjectId, ref: "Application" }]
