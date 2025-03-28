@@ -166,7 +166,7 @@
         const fetchDashboardDetails = () => {
           axios
             .get("http://localhost:5000/api/buyer/dashboard", {
-              withCredentials: true,
+              credentials: "include",
             })
             .then((response) => {
               const { user, applications, uniqueJobs } = response.data;

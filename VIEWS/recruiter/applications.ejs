@@ -79,7 +79,7 @@
 
             const fetchApplicantionList = () => {
                 axios.get('http://localhost:5000/api/recruiter/applications', {
-                    withCredentials: true,
+                    credentials: "include",
                 }).then((response) => {
                     // console.log('then block mei huuuuuu');
                     setApplicationList(response.data.rows); 
