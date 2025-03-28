@@ -332,7 +332,7 @@ router.get("/dashboard", authMiddleware(["buyer", "applicant"]), async (req, res
         ]);
         
         res.json({
-            user: userWithParsedSkills,
+            user: user,
             applications,
             uniqueJobs
         });
@@ -381,7 +381,7 @@ router.get("/applicant-dashboard", authMiddleware(["buyer", "applicant"]), async
             userId: req.user._id,
             profilePic: user.profilePic || "user.png",
             isLogged: true,
-            user: userWithParsedSkills,
+            user: user,
             notifications
         });
     } catch (error) {
@@ -389,7 +389,6 @@ router.get("/applicant-dashboard", authMiddleware(["buyer", "applicant"]), async
         res.status(500).json({ msg: "Server error", error: error.message });
     }
 });
-
 
 // 📌 Get user profile for editing
 router.get("/edit-profile", authMiddleware(["buyer", "applicant"]), async (req, res) => {

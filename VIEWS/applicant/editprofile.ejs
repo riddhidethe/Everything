@@ -11,13 +11,13 @@
     />
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-    <link rel="stylesheet" href="/PUBLIC/CSS/applicant_style.css">
-    <link rel="stylesheet" href="/PUBLIC/CSS/style.css">
+    <link rel="stylesheet" href="/public/CSS/applicant_style.css">
+    <link rel="stylesheet" href="/public/CSS/style.css">
     <script src="/function/Babel.js"></script>
     <script src="/function/React.js"></script>
     <script src="/function/ReactDOM.js"></script>
 
-    <link rel="shortcut icon" href="/PUBLIC/ASSETS/IMAGES/favicon.png" type="image/x-icon">
+    <link rel="shortcut icon" href="/public/ASSETS/IMAGES/favicon.png" type="image/x-icon">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
@@ -40,9 +40,9 @@
           </div>
           <div class="profile-pic-div" id="profile-div">
             <% if(profilePic == null){ %>
-              <img src="/PUBLIC/ASSETS/IMAGES/user.png" alt="profile-picture">
+              <img src="/public/ASSETS/IMAGES/user.png" alt="profile-picture">
             <% }else{ %>
-            <img src="/PUBLIC/ASSETS/UPLOADS/profile_images/<%= profilePic %>" alt="profile-picture">
+            <img src="/public/ASSETS/UPLOADS/profile_images/<%= profilePic %>" alt="profile-picture">
             <% } %>
           </div>
         </div>
@@ -67,7 +67,7 @@
                 <div class="notification-upper notification-slot">
                   <h3><%= notification.job_role %></h3>
                   <div class="company-logo-box">
-                    <img src="/PUBLIC/ASSETS/IMAGES/company_logos/<%= notification.company %>.png" alt="company-logo">
+                    <img src="/public/ASSETS/IMAGES/company_logos/<%= notification.company %>.png" alt="company-logo">
                   </div>
                 </div>
                 <div class="notification-lower notification-slot">
@@ -106,7 +106,7 @@
                         <div class="profile-photo-container">
                             <% if (applicant.profile_pic_code) { %>
                                 <div class="profile-pic-box" id="profile-div" >
-                                  <img src="/PUBLIC/ASSETS/UPLOADS/profile_images/<%= applicant.profile_pic_code %>" alt="Profile Photo" style="width: 150px; height: 160px; border-radius: 50%;">
+                                  <img src="/public/ASSETS/UPLOADS/profile_images/<%= applicant.profile_pic_code %>" alt="Profile Photo" style="width: 150px; height: 160px; border-radius: 50%;">
                                   <input type="text" name="profilePic" value="<%=applicant.profile_pic_code %>" hidden>
                                   <a href="/api/buyer/delete-profile-pic?picName=<%=applicant.profile_pic_code%>" id="removeProfilePic"><i class="fa-solid fa-xmark"></i> </a>
                                 </div>
@@ -179,7 +179,7 @@
                     <span class="applicant">
                         <h4>CV</h4>
                         <% if (applicant.cv) { %>
-                            <a href="/PUBLIC/ASSETS/UPLOADS/cv_pdfs/<%= applicant.cv %>" target="_blank">View CV</a>
+                            <a href="/public/ASSETS/UPLOADS/cv_pdfs/<%= applicant.cv %>" target="_blank">View CV</a>
                         <% } else { %>
                             <p>No file chosen</p>
                         <% } %>
@@ -201,10 +201,10 @@
 
     <!-- Embed the data in a script tag -->
     
-    <script src="/PUBLIC/JS/script.js"></script>
+    <script src="/public/JS/script.js"></script>
     
-    <script type="text/babel" src="/PUBLIC/COMPONENTS/Footer.js"></script>
-    <script type="text/babel" src="/PUBLIC/COMPONENTS/Header.js"></script>
+    <script type="text/babel" src="/public/COMPONENTS/Footer.js"></script>
+    <script type="text/babel" src="/public/COMPONENTS/Header.js"></script>
 
     <script type="text/babel">
       ReactDOM.render(<Footer />, document.getElementById("footer"));

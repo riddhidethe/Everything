@@ -29,7 +29,7 @@ timeLine.from('h1 span', {
 });
 timeLine.to('.titleBox', {
     scale: 1.5,
-    duration: 2,
+    duration: 5,
     opacity: 0,
     delay: 0.3
 });

@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="/PUBLIC/CSS/applicant_style.css">
+  <link rel="stylesheet" href="/public/CSS/applicant_style.css">
 
   <script src="/function/Babel.js"></script>
   <script src="/function/React.js"></script>
   <script src="/function/ReactDOM.js"></script>
   
-  <link rel="shortcut icon" href="/PUBLIC/ASSETS/IMAGES/favicon.png" type="image/x-icon">
+  <link rel="shortcut icon" href="/public/ASSETS/IMAGES/favicon.png" type="image/x-icon">
   <script crossorigin src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
     integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -53,7 +53,7 @@
       // Fetch notifications using the stored token
       fetch("/api/buyer/notifications", {
         method: "GET",
-        headers: { "Authorization": `Bearer ${token}` }
+        withCredentials: true,
       })
       .then(response => response.json())
       .then(data => {
@@ -95,7 +95,7 @@
   function deleteNotification(jobId) {
     fetch(`/api/buyer/delete-notification?jobid=${jobId}`, {
       method: "DELETE",
-      headers: { "Authorization": `Bearer ${localStorage.getItem("token")}` }
+      withCredentials: true,
     }).then(() => {
       location.reload(); // Refresh notifications
     });
@@ -117,9 +117,9 @@
         
         <div class="profile-pic-div" id="profile-div">
           <% if(profilePic == null){ %>
-            <img src="/PUBLIC/ASSETS/IMAGES/user.png" alt="profile-picture">
+            <img src="/public/ASSETS/IMAGES/user.png" alt="profile-picture">
           <% }else{ %>
-          <img src="/PUBLIC/ASSETS/UPLOADS/profile_images/<%= profilePic %>" alt="profile-picture">
+          <img src="/public/ASSETS/UPLOADS/profile_images/<%= profilePic %>" alt="profile-picture">
           <% } %>
         </div>
       </div>
@@ -153,9 +153,9 @@
     <div class="footerContainer" id="footer"></div>
   </footer>
 
-  <script src="/PUBLIC/JS/script.js"></script>
-  <script type="text/babel" src="/PUBLIC/components/Footer.js"></script>
-  <script type="text/babel" src="/PUBLIC/components/Header.js"></script>
+  <script src="/public/JS/script.js"></script>
+  <script type="text/babel" src="/public/components/Footer.js"></script>
+  <script type="text/babel" src="/public/components/Header.js"></script>
 
   <script>
     let toastBox = document.getElementById("toastBox");
@@ -194,8 +194,7 @@
 
       const fetchJobList = () => {
         axios.get("http://localhost:5000/api/buyer/jobs", {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-          withCredentials: true
+          withCredentials: true,
         }).then((response) => {
             setJobList(response.data.rows);
           }).catch((error) => {
@@ -214,7 +213,6 @@
         };
 
         axios.post('http://localhost:5000/api/buyer/filters', {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
           withCredentials: true
         }, filters)
           .then(response => {
@@ -403,14 +401,14 @@
 
               {
                 jobList.length == 0 ? (<div className="noJobsFound">
-                  <img src="/PUBLIC/ASSETS/IMAGES/No data.png" alt=""/> 
+                  <img src="/public/ASSETS/IMAGES/No data.png" alt=""/> 
                   <div className="noJobs-txt">No Jobs are Found</div> 
                 </div>
 ) : ( <div className="jobList">
               {currentJobs.map((job) => (
                 <div className="job-item" key={job.id}>
                   <div className="jobHead">
-                    <img src={`/PUBLIC/ASSETS/IMAGES/company_logos/${job.company}.png`} alt="" />
+                    <img src={`/public/ASSETS/IMAGES/company_logos/${job.company}.png`} alt="" />
                     <div className="jobHeaders">
                       <div className="jobRole">{job.job_role}</div>
                       <div className="jobCompany">{job.company}</div>

@@ -7,8 +7,8 @@
     <script src="/function/Babel.js"></script>
     <script src="/function/React.js"></script>
     <script src="/function/ReactDOM.js"></script>
-    <link rel="shortcut icon" href="/PUBLIC/ASSETS/IMAGES/favicon.png" type="image/x-icon">
-    <link rel="stylesheet" href="/PUBLIC/css/recruiter_style.css">
+    <link rel="shortcut icon" href="/public/ASSETS/IMAGES/favicon.png" type="image/x-icon">
+    <link rel="stylesheet" href="/public/css/recruiter_style.css">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
@@ -59,9 +59,9 @@
       </script>
 
 
-    <script type="text/babel" src="/PUBLIC/components/SideNavBar.js"></script>
-    <script type="text/babel" src="/PUBLIC/components/RecruiterHeader.js"></script>
-    <script type="text/babel" src="/PUBLIC/components/RecruiterFooter.js"></script>
+    <script type="text/babel" src="/public/components/SideNavBar.js"></script>
+    <script type="text/babel" src="/public/components/RecruiterHeader.js"></script>
+    <script type="text/babel" src="/public/components/RecruiterFooter.js"></script>
 
     <script type="text/babel">
 
@@ -79,7 +79,7 @@
 
             const fetchApplicantionList = () => {
                 axios.get('http://localhost:5000/api/recruiter/allSavedApplications', {
-                    headers: { Authorization: `Bearer ${yourToken}` }
+                    withCredentials: true,
                 }).then((response) => {
                     // console.log('then block mei huuuuuu');
                     setApplicationList(response.data.rows); 
@@ -96,7 +96,7 @@
 
                 // Send POST request to /filters endpoint
                 axios.post('http://localhost:5000/api/recruiter/filteredApplications', {
-                    headers: { Authorization: `Bearer ${yourToken}` }
+                    withCredentials: true,
                 }, jobRole)
                 .then(response => {
                     setApplicationList(response.data.rows);
@@ -191,7 +191,7 @@
                     }
                     
                 </div> : <div className="application-card-container no-application">
-                    <img src="/PUBLIC/ASSETS/IMAGES/No data.png" alt=""/>
+                    <img src="/public/ASSETS/IMAGES/No data.png" alt=""/>
                     <h3>No Application Found</h3>                                        
                 </div>
                 }

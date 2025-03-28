@@ -24,7 +24,7 @@ app.use(cors({
     origin: ["http://localhost:5000"], // ✅ Change to your frontend URL
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     credentials: true,
-    allowedHeaders: ["Authorization", "Content-Type"], 
+    allowedHeaders: ["Content-Type"], 
 }));
 
 app.use(express.json());

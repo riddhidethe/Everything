@@ -14,7 +14,7 @@
     <script src="/function/React.js"></script>
     <script src="/function/ReactDOM.js"></script>
     <script crossorigin src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <link rel="shortcut icon" href="/PUBLIC/ASSETS/IMAGES/favicon.png" type="image/x-icon">
+    <link rel="shortcut icon" href="/public/ASSETS/IMAGES/favicon.png" type="image/x-icon">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <title>Applicant Dashboard | Everything.india</title>
     <style>
@@ -166,7 +166,7 @@
         const fetchDashboardDetails = () => {
           axios
             .get("http://localhost:5000/api/buyer/dashboard", {
-              headers: { Authorization: `Bearer ${yourToken}` }
+              withCredentials: true,
             })
             .then((response) => {
               const { user, applications, uniqueJobs } = response.data;
@@ -212,9 +212,9 @@
                 <div className="profile-pic">
                   <img
                     src={
-                      userProfile.profile_pic_code
-                        ? `/PUBLIC/ASSETS/UPLOADS/profile_images/${userProfile.profile_pic_code}`
-                        : "/PUBLIC/ASSETS/IMAGES/user.png"
+                      userProfile.profilePic
+                        ? `/public/ASSETS/UPLOADS/profile_images/${userProfile.profilPic}`
+                        : "/public/ASSETS/IMAGES/user.png"
                     }
                     alt="profile-picture"
                   />
@@ -234,7 +234,7 @@
                 </a>
                 <div className="buttons">
                   <a
-                    href={`/PUBLIC/ASSETS/UPLOADS/cv_pdfs/${userProfile.cv}`}
+                    href={`/public/ASSETS/UPLOADS/cv_pdfs/${userProfile.cv}`}
                     download
                   >
                     <div className="dashboard-button">Resume</div>
@@ -301,7 +301,7 @@
                         </div>
                         <div className="jobCard-upper-right-box">
                           <img
-                            src={`/PUBLIC/ASSETS/IMAGES/company_logos/${application.company}.png`}
+                            src={`/public/ASSETS/IMAGES/company_logos/${application.company}.png`}
                             alt="company-logo"
                           />
                         </div>

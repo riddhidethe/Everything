@@ -708,7 +708,7 @@ function getRedirectUrl(role, userId) {
 }
 
 // Logout
-router.post("/logout", (req, res) => {
+router.get("/logout", (req, res) => {
     req.session.destroy((err) => {
         if (err) {
             return res.status(500).json({ msg: "Error logging out" });
