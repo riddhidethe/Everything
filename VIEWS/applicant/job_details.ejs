@@ -24,6 +24,107 @@
 
     <title>Everything.india | Home Page</title>
   </head>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", async function() {
+      const profileBox = document.getElementById("profile-box");
+      const profileDiv = document.getElementById("profile-div");
+      const notificationBell = document.getElementById("notification-bell");
+      const dropdownBox = document.getElementById("drop-box");
+      const loginButton = document.getElementById("btn-box");
+      const notificationDetailBox = document.getElementById("notification-detail-box");
+
+      if (isLogged) {  
+          profileBox.style.display = "flex";  
+          profileDiv.style.display = "block"; // Ensure it's visible  
+          notificationBell.style.display = "block";  
+          loginButton.style.display = "none"; // Hide login button after login  
+      } else {  
+          profileBox.style.display = "flex";  
+          profileDiv.style.display = "none";  
+          notificationBell.style.display = "none";  
+          loginButton.style.display = "flex";  
+      }
+
+      try {
+        const response = await fetch("/api/auth/check-auth", {
+          method: "GET",
+          credentials: "include"
+        });
+
+        const userData = await response.json();
+        console.log("Auth Check Response:", userData); // Debugging response
+
+        // Ensure userData exists before checking properties
+        if (userData && userData.isAuthenticated) {
+          console.log("User is authenticated:", userData.user);
+
+          // // Show profile picture if available
+          // if (userData.user && userData.user.profilePic) {
+          //   profileDiv.innerHTML = `<img src="/PUBLIC/ASSETS/UPLOADS/profile_images/${userData.user.profilePic}" alt="profile-picture">`;
+          // } else {
+          //   profileDiv.innerHTML = `<img src="/PUBLIC/ASSETS/IMAGES/user.png" alt="profile-picture">`;
+          // }
+
+          // Show profile elements
+          profileDiv.style.display = "flex";
+          notificationBell.style.display = "flex";
+          loginButton.style.display = "none"; // Hide login button if user is logged in
+
+          profileBox.addEventListener("click", () => {
+            dropdownBox.style.display = dropdownBox.style.display === "none" ? "flex" : "none";
+          });
+
+          // Fetch notifications
+          const notificationResponse = await fetch("/api/buyer/notifications", {
+            method: "GET",
+            credentials: "include"
+          });
+
+          const notifications = await notificationResponse.json();
+          if (notifications.length > 0) {
+            notificationDetailBox.innerHTML = notifications.map(notification => `
+              <li class="notification">
+                <div class="notification-upper notification-slot">
+                  <h3>${notification.job_role}</h3>
+                  <div class="company-logo-box">
+                    <img src="/public/ASSETS/IMAGES/company_logos/${notification.company}.png" alt="company-logo">
+                  </div>
+                </div>
+                <div class="notification-lower notification-slot">
+                  <p><span>Status:</span> ${notification.application_status}</p>
+                  <a href="#" onclick="deleteNotification('${notification.job_id}')"><i class="fa-solid fa-trash"></i></a>
+                </div>
+              </li>
+            `).join('');
+          } else {
+            notificationDetailBox.innerHTML = `<h3 class="no-notification">No notifications yet</h3>`;
+          }
+        } else {
+          profileDiv.style.display = "none";
+          notificationBell.style.display = "none";
+          dropdownBox.style.display = "none";
+          loginButton.style.display = "flex"; // Ensure login button is displayed
+        }
+      } catch (error) {
+        console.error("Error checking authentication:", error);
+        profileDiv.style.display = "none";
+        notificationBell.style.display = "none";
+        dropdownBox.style.display = "none";
+        loginButton.style.display = "flex"; // Ensure login button is displayed even if an error occurs
+      }
+    });
+
+    function deleteNotification(jobId) {
+      fetch(`/api/buyer/delete-notification?jobid=${jobId}`, {
+        method: "DELETE",
+        credentials: "include"
+      }).then(() => {
+        location.reload();
+      });
+    }
+</script> 
+
   <body>
     <!-- header section  -->
     <header>

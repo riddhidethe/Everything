@@ -150,6 +150,11 @@ router.get("/home", authMiddleware(["buyer", "applicant"]), async (req, res) => 
         console.log("Session in /home:", req.session);
         console.log("User from middleware:", req.user);
 
+        // ✅ Redirect to login if not logged in
+        if (!req.user || !req.user._id) {
+            return res.redirect("/api/auth/login");  // Change "/login" to your actual login route
+        }
+
         const user = await User.findById(req.user._id);
         if (!user) return res.status(404).json({ msg: "User not found" });
         
@@ -196,9 +201,10 @@ router.get("/home", authMiddleware(["buyer", "applicant"]), async (req, res) => 
 // 📌 Get job list
 router.get("/job-list", authMiddleware(["buyer", "applicant"]), async (req, res) => {
     try {
-        // Ensure user is authenticated and available
-        if (!req.user) {
-            return res.status(401).json({ msg: "Unauthorized: User not found" });
+        
+        // ✅ Redirect to login if not logged in
+        if (!req.user || !req.user._id) {
+            return res.redirect("/api/auth/login");  // Change "/login" to your actual login route
         }
 
         // Get all jobs
@@ -307,6 +313,11 @@ router.get("/job-details/:id", authMiddleware(["buyer", "applicant"]), async (re
 // 📌 Get user dashboard data
 router.get("/dashboard", authMiddleware(["buyer", "applicant"]), async (req, res) => {
     try {
+        
+        // ✅ Redirect to login if not logged in
+        if (!req.user || !req.user._id) {
+            return res.redirect("/api/auth/login");  // Change "/login" to your actual login route
+        }
         // Get user data
         const user = await User.findById(req.user._id);
         if (!user) return res.status(404).json({ msg: "User not found" });
@@ -344,9 +355,10 @@ router.get("/dashboard", authMiddleware(["buyer", "applicant"]), async (req, res
 // 📌 Get applicant dashboard
 router.get("/applicant-dashboard", authMiddleware(["buyer", "applicant"]), async (req, res) => {
     try {
-        // Check if req.user exists
+        
+        // ✅ Redirect to login if not logged in
         if (!req.user || !req.user._id) {
-            return res.status(401).json({ msg: "Unauthorized: User not found in session" });
+            return res.redirect("/api/auth/login");  // Change "/login" to your actual login route
         }
 
         console.log("User ID:", req.user._id); // Debugging

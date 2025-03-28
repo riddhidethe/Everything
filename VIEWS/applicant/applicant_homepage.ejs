@@ -154,7 +154,18 @@
           </ul>
         </div>
     
-        <div class="notification-detail-box hidden" id="notification-detail-box"></div>
+        <div class="notification-detail-box hidden" id="notification-detail-box">
+          <% if (notifications && notifications.length > 0) { %>
+            <% notifications.forEach(notification => { %>
+              <div class="notification-item">
+                <p><%= notification.jobId.title %>: <%= notification.status %></p>
+              </div>
+            <% }) %>
+          <% } else { %>
+            <h3 class="no-notification">No notifications yet</h3>
+          <% } %>
+        </div>
+        
         <% } else { %>
           <div class="button-box" id="btn-box">
             <a class='myBtn' href="/api/auth/login">Login</a>

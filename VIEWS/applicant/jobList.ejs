@@ -17,48 +17,64 @@
 </head>
 
 <script>
-  document.addEventListener("DOMContentLoaded", () => {
-    let token = localStorage.getItem("token"); // Get token from localStorage
-
-    const urlParams = new URLSearchParams(window.location.search);
-    const urlToken = urlParams.get('token'); // Get token from URL
-    console.log(localStorage.getItem("token"));
-
-    if (urlToken) {
-        console.log("Token retrieved from URL:", urlToken);
-        localStorage.setItem("token", urlToken); // Store token
-        token = urlToken; // Use the new token
-    } 
-
-    console.log("Stored Token:", token);
-
+  document.addEventListener("DOMContentLoaded", async function() {
     const profileBox = document.getElementById("profile-box");
+    const profileDiv = document.getElementById("profile-div");
     const notificationBell = document.getElementById("notification-bell");
     const dropdownBox = document.getElementById("drop-box");
     const loginButton = document.getElementById("btn-box");
     const notificationDetailBox = document.getElementById("notification-detail-box");
 
-    if (token) {
-      // User is logged in
-      profileBox.style.display = "flex";
-      notificationBell.style.display = "flex";
-      loginButton.style.display = "none"; // Hide login button
+    if (isLogged) {  
+        profileBox.style.display = "flex";  
+        profileDiv.style.display = "block"; // Ensure it's visible  
+        notificationBell.style.display = "block";  
+        loginButton.style.display = "none"; // Hide login button after login  
+    } else {  
+        profileBox.style.display = "flex";  
+        profileDiv.style.display = "none";  
+        notificationBell.style.display = "none";  
+        loginButton.style.display = "flex";  
+    }
 
-      dropdownBox.style.display = "none";
-
-      profileBox.addEventListener("click", () => {
-        dropdownBox.style.display = dropdownBox.style.display === "none" ? "flex" : "none";
+    try {
+      const response = await fetch("/api/auth/check-auth", {
+        method: "GET",
+        credentials: "include"
       });
 
-      // Fetch notifications using the stored token
-      fetch("/api/buyer/notifications", {
-        method: "GET",
-        credentials: "include",
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.length > 0) {
-          notificationDetailBox.innerHTML = data.map(notification => `
+      const userData = await response.json();
+      console.log("Auth Check Response:", userData); // Debugging response
+
+      // Ensure userData exists before checking properties
+      if (userData && userData.isAuthenticated) {
+        console.log("User is authenticated:", userData.user);
+
+        // // Show profile picture if available
+        // if (userData.user && userData.user.profilePic) {
+        //   profileDiv.innerHTML = `<img src="/PUBLIC/ASSETS/UPLOADS/profile_images/${userData.user.profilePic}" alt="profile-picture">`;
+        // } else {
+        //   profileDiv.innerHTML = `<img src="/PUBLIC/ASSETS/IMAGES/user.png" alt="profile-picture">`;
+        // }
+
+        // Show profile elements
+        profileDiv.style.display = "flex";
+        notificationBell.style.display = "flex";
+        loginButton.style.display = "none"; // Hide login button if user is logged in
+
+        profileBox.addEventListener("click", () => {
+          dropdownBox.style.display = dropdownBox.style.display === "none" ? "flex" : "none";
+        });
+
+        // Fetch notifications
+        const notificationResponse = await fetch("/api/buyer/notifications", {
+          method: "GET",
+          credentials: "include"
+        });
+
+        const notifications = await notificationResponse.json();
+        if (notifications.length > 0) {
+          notificationDetailBox.innerHTML = notifications.map(notification => `
             <li class="notification">
               <div class="notification-upper notification-slot">
                 <h3>${notification.job_role}</h3>
@@ -75,32 +91,30 @@
         } else {
           notificationDetailBox.innerHTML = `<h3 class="no-notification">No notifications yet</h3>`;
         }
-      });
-    } else {
-      // User is not logged in
-      profileBox.style.display = "none";
+      } else {
+        profileDiv.style.display = "none";
+        notificationBell.style.display = "none";
+        dropdownBox.style.display = "none";
+        loginButton.style.display = "flex"; // Ensure login button is displayed
+      }
+    } catch (error) {
+      console.error("Error checking authentication:", error);
+      profileDiv.style.display = "none";
       notificationBell.style.display = "none";
       dropdownBox.style.display = "none";
-      loginButton.style.display = "block"; // Show login button
+      loginButton.style.display = "flex"; // Ensure login button is displayed even if an error occurs
     }
   });
 
-  // Logout function
-  function logout() {
-    localStorage.removeItem("token"); // Remove token
-    window.location.href = "/api/auth/login"; // Redirect to login
-  }
-
-  // Delete notification function
   function deleteNotification(jobId) {
     fetch(`/api/buyer/delete-notification?jobid=${jobId}`, {
       method: "DELETE",
-      credentials: "include",
+      credentials: "include"
     }).then(() => {
-      location.reload(); // Refresh notifications
+      location.reload();
     });
   }
-</script>
+</script> 
 
 <body>
   
@@ -108,7 +122,7 @@
   <header>
     <div id="header-box">
       <div class="header-container" id="header"></div>
-  
+      <% if (isLogged != null && isLogged == true) { %>
       <div class="profile-box" id="profile-box">
         <div class="notification-box" id="notification-bell">
           <i class="fa-solid fa-bell"></i>
@@ -116,27 +130,39 @@
         </div>
         
         <div class="profile-pic-div" id="profile-div">
-          <% if(profilePic == null){ %>
+          <% if (typeof profilePic === 'undefined' || profilePic == null || profilePic === '') { %>
             <img src="/public/ASSETS/IMAGES/user.png" alt="profile-picture">
-          <% }else{ %>
-          <img src="/public/ASSETS/UPLOADS/profile_images/<%= profilePic %>" alt="profile-picture">
+          <% } else { %>
+            <img src="/public/ASSETS/UPLOADS/profile_images/<%= profilePic %>" alt="profile-picture">
           <% } %>
         </div>
-      </div>
+        
   
       <div class="dropdown-box hidden" id="drop-box">
         <ul>
           <li><a href="/api/buyer/edit-profile">Edit Profile</a></li>
           <li><a href="/api/buyer/change-password">Change Password</a></li>
-          <li class="logout-btn"><a href="#" onclick="logout()">Logout <i class="fa-solid fa-right-from-bracket"></i></a></li>
+          <li class="logout-btn"><a href="/api/auth/logout">Logout <i class="fa-solid fa-right-from-bracket"></i></a></li>
         </ul>
       </div>
   
-      <div class="notification-detail-box hidden" id="notification-detail-box"></div>
-  
-      <div class="button-box" id="btn-box">
-        <a class='myBtn' href="/api/auth/login">Login</a>
+      <div class="notification-detail-box hidden" id="notification-detail-box">
+        <% if (notifications && notifications.length > 0) { %>
+          <% notifications.forEach(notification => { %>
+            <div class="notification-item">
+              <p><%= notification.jobId.title %>: <%= notification.status %></p>
+            </div>
+          <% }) %>
+        <% } else { %>
+          <h3 class="no-notification">No notifications yet</h3>
+        <% } %>
       </div>
+      
+      <% } else { %>
+        <div class="button-box" id="btn-box">
+          <a class='myBtn' href="/api/auth/login">Login</a>
+        </div>
+      <% } %>
     </div>
   </header>
   <!-- header section ends here -->
