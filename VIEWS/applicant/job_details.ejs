@@ -16,7 +16,7 @@
     <script src="/function/React.js"></script>
     <script src="/function/ReactDOM.js"></script>
 
-    <link rel="shortcut icon" href="/public/ASSETS/IMAGES/favicon.png" type="image/x-icon">
+    <link rel="shortcut icon" href="/PUBLIC/ASSETS/IMAGES/favicon.png" type="image/x-icon">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
@@ -88,7 +88,7 @@
                 <div class="notification-upper notification-slot">
                   <h3>${notification.job_role}</h3>
                   <div class="company-logo-box">
-                    <img src="/public/ASSETS/IMAGES/company_logos/${notification.company}.png" alt="company-logo">
+                    <img src="/PUBLIC/ASSETS/IMAGES/company_logos/${notification.company}.png" alt="company-logo">
                   </div>
                 </div>
                 <div class="notification-lower notification-slot">
@@ -142,9 +142,9 @@
           </div>
           <div class="profile-pic-div" id="profile-div">
             <% if(profilePic == null || profilePic === "user.png"){ %>
-              <img src="/public/ASSETS/IMAGES/user.png" alt="profile-picture">
+              <img src="/PUBLIC/ASSETS/IMAGES/user.png" alt="profile-picture">
             <% }else{ %>
-            <img src="/public/ASSETS/UPLOADS/profile_images/<%= profilePic %>" alt="profile-picture">
+            <img src="/PUBLIC/ASSETS/UPLOADS/profile_images/<%= profilePic %>" alt="profile-picture">
             <% } %>
           </div>
         </div>
@@ -169,7 +169,7 @@
                 <div class="notification-upper notification-slot">
                   <h3><%= notification.job_role %></h3>
                   <div class="company-logo-box">
-                    <img src="/public/ASSETS/IMAGES/company_logos/<%= notification.company %>.png" alt="company-logo">
+                    <img src="/PUBLIC/ASSETS/IMAGES/company_logos/<%= notification.company %>.png" alt="company-logo">
                   </div>
                 </div>
                 <div class="notification-lower notification-slot">
@@ -204,7 +204,7 @@
                 <div class="job-role">
                     <p><%= job.job_role %></p>
                     <div class="company-icon">
-                        <img src="/public/ASSETS/IMAGES/company_logos/<%=job.company%>.png">
+                        <img src="/PUBLIC/ASSETS/IMAGES/company_logos/<%=job.company%>.png">
                     </div>
                 </div>
                 <div class="about-job-box">
@@ -305,7 +305,7 @@
               <div class="jobDesc"><%= job.job_desc %></div>
               <div class="othDetails3">
                 <div class="compImg">
-                  <img src="/public/ASSETS/IMAGES/company_logos/<%=job.company %>.png" alt="company logo">
+                  <img src="/PUBLIC/ASSETS/IMAGES/company_logos/<%=job.company %>.png" alt="company logo">
                 </div>
                 <div class="moreDetailsbtn">
                   <a href="/api/auth/apply-job?jobID=<%job.job_id%>">Apply Now</a>
@@ -327,10 +327,10 @@
 
     <!-- Embed the data in a script tag -->
     
-    <script src="/public/JS/script.js"></script>
+    <script src="/PUBLIC/JS/script.js"></script>
     
-    <script type="text/babel" src="/public/COMPONENTS/Footer.js"></script>
-    <script type="text/babel" src="/public/COMPONENTS/Header.js"></script>
+    <script type="text/babel" src="/PUBLIC/COMPONENTS/Footer.js"></script>
+    <script type="text/babel" src="/PUBLIC/COMPONENTS/Header.js"></script>
 
     <script type="text/babel">
       ReactDOM.render(<Footer />, document.getElementById("footer"));

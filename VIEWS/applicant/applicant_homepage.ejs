@@ -11,12 +11,12 @@
     />
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-    <link rel="stylesheet" href="/public/CSS/applicant_style.css">
+    <link rel="stylesheet" href="/PUBLIC/CSS/applicant_style.css">
     <script src="/function/Babel.js"></script>
     <script src="/function/React.js"></script>
     <script src="/function/ReactDOM.js"></script>
 
-    <link rel="shortcut icon" href="/public/ASSETS/IMAGES/favicon.png" type="image/x-icon">
+    <link rel="shortcut icon" href="/PUBLIC/ASSETS/IMAGES/favicon.png" type="image/x-icon">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
@@ -88,7 +88,7 @@
                 <div class="notification-upper notification-slot">
                   <h3>${notification.job_role}</h3>
                   <div class="company-logo-box">
-                    <img src="/public/ASSETS/IMAGES/company_logos/${notification.company}.png" alt="company-logo">
+                    <img src="/PUBLIC/ASSETS/IMAGES/company_logos/${notification.company}.png" alt="company-logo">
                   </div>
                 </div>
                 <div class="notification-lower notification-slot">
@@ -139,9 +139,9 @@
           
           <div class="profile-pic-div" id="profile-div">
             <% if (typeof profilePic === 'undefined' || profilePic == null || profilePic === '' || profilePic === "user.png") { %>
-              <img src="/public/ASSETS/IMAGES/user.png" alt="profile-picture">
+              <img src="/PUBLIC/ASSETS/IMAGES/user.png" alt="profile-picture">
             <% } else { %>
-              <img src="/public/ASSETS/UPLOADS/profile_images/<%= profilePic %>" alt="profile-picture">
+              <img src="/PUBLIC/ASSETS/UPLOADS/profile_images/<%= profilePic %>" alt="profile-picture">
             <% } %>
           </div>
           
@@ -183,7 +183,7 @@
         <p class="heroPara">Unlock Your True Potential And Discover A World Of Opportunities That Align With Your Skills, Interests, And Aspirations</p>
       </div>
       <div class="hero-image-container heroContainer">
-        <img src="/public/ASSETS/IMAGES/job_portal_hero.png" alt="" id="hero-image">
+        <img src="/PUBLIC/ASSETS/IMAGES/job_portal_hero.png" alt="" id="hero-image">
       </div>
     </section>
     <!-- hero section ends here  -->
@@ -198,7 +198,7 @@
         </div>
         <div class="howWeWorkContent">
           <div class="howWeWorkContentBox">
-            <img src="/public/ASSETS/IMAGES/job search.png" alt="JOB-SEARCH-IMAGE">
+            <img src="/PUBLIC/ASSETS/IMAGES/job search.png" alt="JOB-SEARCH-IMAGE">
           </div>
           <div class="howWeWorkContentBox">
             <div class="stepBox">
@@ -252,7 +252,7 @@
                 <div class="jobDesc"><%= job.job_desc %></div>
                 <div class="othDetails3">
                   <div class="compImg">
-                    <img src="/public/ASSETS/IMAGES/company_logos/<%=job.company %>.png" alt="company logo">
+                    <img src="/PUBLIC/ASSETS/IMAGES/company_logos/<%=job.company %>.png" alt="company logo">
                   </div>
                   <div class="moreDetailsbtn">
                     <a href="/api/buyer/jobDetails?jobid=<%= job.job_id %>">View Details</a>
@@ -283,27 +283,27 @@
         </div>
         <div class="howWeWorkContent hiringPartnersContent">
           <div class="company-row reveal">
-            <div class="img_box"><img src="/public/ASSETS/IMAGES/company_logos/amazon.png" alt=""></div>
-            <div class="img_box"><img src="/public/ASSETS/IMAGES/company_logos/microsoft.png" alt=""></div>
-            <div class="img_box"><img src="/public/ASSETS/IMAGES/company_logos/google.png" alt=""></div>
-            <div class="img_box"><img src="/public/ASSETS/IMAGES/company_logos/jpmorgan.png" alt=""></div>
-            <div class="img_box"><img src="/public/ASSETS/IMAGES/company_logos/deloitte.png" alt=""></div>
+            <div class="img_box"><img src="/PUBLIC/ASSETS/IMAGES/company_logos/amazon.png" alt=""></div>
+            <div class="img_box"><img src="/PUBLIC/ASSETS/IMAGES/company_logos/microsoft.png" alt=""></div>
+            <div class="img_box"><img src="/PUBLIC/ASSETS/IMAGES/company_logos/google.png" alt=""></div>
+            <div class="img_box"><img src="/PUBLIC/ASSETS/IMAGES/company_logos/jpmorgan.png" alt=""></div>
+            <div class="img_box"><img src="/PUBLIC/ASSETS/IMAGES/company_logos/deloitte.png" alt=""></div>
           </div>
     
           <div class="company-row reveal">
-            <div class="img_box"><img src="/public/ASSETS/IMAGES/company_logos/paypal.png" alt=""></div>
-            <div class="img_box"><img src="/public/ASSETS/IMAGES/company_logos/ibm.png" alt=""></div>
-            <div class="img_box"><img src="/public/ASSETS/IMAGES/company_logos/samsung.png" alt=""></div>
-            <div class="img_box"><img src="/public/ASSETS/IMAGES/company_logos/airtel.png" alt=""></div>
-            <div class="img_box"><img src="/public/ASSETS/IMAGES/company_logos/persistant.png" alt=""></div>
+            <div class="img_box"><img src="/PUBLIC/ASSETS/IMAGES/company_logos/paypal.png" alt=""></div>
+            <div class="img_box"><img src="/PUBLIC/ASSETS/IMAGES/company_logos/ibm.png" alt=""></div>
+            <div class="img_box"><img src="/PUBLIC/ASSETS/IMAGES/company_logos/samsung.png" alt=""></div>
+            <div class="img_box"><img src="/PUBLIC/ASSETS/IMAGES/company_logos/airtel.png" alt=""></div>
+            <div class="img_box"><img src="/PUBLIC/ASSETS/IMAGES/company_logos/persistant.png" alt=""></div>
           </div>
     
           <div class="company-row reveal">
-            <div class="img_box"><img src="/public/ASSETS/IMAGES/company_logos/accenture.png" alt=""></div>
-            <div class="img_box"><img src="/public/ASSETS/IMAGES/company_logos/cisco.png" alt=""></div>
-            <div class="img_box"><img src="/public/ASSETS/IMAGES/company_logos/tata consultancy services.png" alt=""></div>
-            <div class="img_box"><img src="/public/ASSETS/IMAGES/company_logos/infosys.png" alt=""></div>
-            <div class="img_box"><img src="/public/ASSETS/IMAGES/company_logos/hcl.png" alt=""></div>
+            <div class="img_box"><img src="/PUBLIC/ASSETS/IMAGES/company_logos/accenture.png" alt=""></div>
+            <div class="img_box"><img src="/PUBLIC/ASSETS/IMAGES/company_logos/cisco.png" alt=""></div>
+            <div class="img_box"><img src="/PUBLIC/ASSETS/IMAGES/company_logos/tata consultancy services.png" alt=""></div>
+            <div class="img_box"><img src="/PUBLIC/ASSETS/IMAGES/company_logos/infosys.png" alt=""></div>
+            <div class="img_box"><img src="/PUBLIC/ASSETS/IMAGES/company_logos/hcl.png" alt=""></div>
           </div>
         </div>
       </div>
@@ -321,7 +321,7 @@
     <!-- GSAP library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" integrity="sha512-7eHRwcbYkK4d9g/6tD/mhkf++eoTHwpNM9woBxtPUBWm67zeAfFC+HrdoE2GanKeocly/VxeLvIqwvCdk7qScg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     
-    <script src="/public/JS/script.js"></script>
+    <script src="/PUBLIC/JS/script.js"></script>
 
     <script>
       document.addEventListener('DOMContentLoaded', ()=>{
@@ -342,8 +342,8 @@
       
     </script>
     
-    <script type="text/babel" src="/public/COMPONENTS/Footer.js"></script>
-    <script type="text/babel" src="/public/COMPONENTS/Header.js"></script>
+    <script type="text/babel" src="/PUBLIC/COMPONENTS/Footer.js"></script>
+    <script type="text/babel" src="/PUBLIC/COMPONENTS/Header.js"></script>
 
     <script type="text/babel">
       

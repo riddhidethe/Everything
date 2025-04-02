@@ -6,7 +6,7 @@ function RecruiterHeader(props){
                     <div className="recruiter-header-icons">
                     <p>Welcome, <span>{props.username}</span></p>
                         <div className="icon-box profile-box">
-                            <img src={`/public/assets/images/company_logos/${props.profilePic}`} alt="Profile"/>
+                            <img src={`PUBLIC/assets/images/company_logos/${props.profilePic}`} alt="Profile"/>
                         </div>
                         
                     </div>

@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="/public/CSS/applicant_style.css">
+  <link rel="stylesheet" href="/PUBLIC/CSS/applicant_style.css">
 
   <script src="/function/Babel.js"></script>
   <script src="/function/React.js"></script>
   <script src="/function/ReactDOM.js"></script>
   
-  <link rel="shortcut icon" href="/public/ASSETS/IMAGES/favicon.png" type="image/x-icon">
+  <link rel="shortcut icon" href="/PUBLIC/ASSETS/IMAGES/favicon.png" type="image/x-icon">
   <script crossorigin src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
     integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -79,7 +79,7 @@
               <div class="notification-upper notification-slot">
                 <h3>${notification.job_role}</h3>
                 <div class="company-logo-box">
-                  <img src="/public/ASSETS/IMAGES/company_logos/${notification.company}.png" alt="company-logo">
+                  <img src="/PUBLIC/ASSETS/IMAGES/company_logos/${notification.company}.png" alt="company-logo">
                 </div>
               </div>
               <div class="notification-lower notification-slot">
@@ -131,9 +131,9 @@
         
         <div class="profile-pic-div" id="profile-div">
           <% if (typeof profilePic === 'undefined' || profilePic == null || profilePic === '' || profilePic === "user.png") { %>
-            <img src="/public/ASSETS/IMAGES/user.png" alt="profile-picture">
+            <img src="/PUBLIC/ASSETS/IMAGES/user.png" alt="profile-picture">
           <% } else { %>
-            <img src="/public/ASSETS/UPLOADS/profile_images/<%= profilePic %>" alt="profile-picture">
+            <img src="/PUBLIC/ASSETS/UPLOADS/profile_images/<%= profilePic %>" alt="profile-picture">
           <% } %>
         </div>
         
@@ -179,9 +179,9 @@
     <div class="footerContainer" id="footer"></div>
   </footer>
 
-  <script src="/public/JS/script.js"></script>
-  <script type="text/babel" src="/public/components/Footer.js"></script>
-  <script type="text/babel" src="/public/components/Header.js"></script>
+  <script src="/PUBLIC/JS/script.js"></script>
+  <script type="text/babel" src="/PUBLIC/components/Footer.js"></script>
+  <script type="text/babel" src="/PUBLIC/components/Header.js"></script>
 
   <script>
     let toastBox = document.getElementById("toastBox");
@@ -427,14 +427,14 @@
 
               {
                 jobList.length == 0 ? (<div className="noJobsFound">
-                  <img src="/public/ASSETS/IMAGES/No data.png" alt=""/> 
+                  <img src="/PUBLIC/ASSETS/IMAGES/No data.png" alt=""/> 
                   <div className="noJobs-txt">No Jobs are Found</div> 
                 </div>
 ) : ( <div className="jobList">
               {currentJobs.map((job) => (
                 <div className="job-item" key={job.id}>
                   <div className="jobHead">
-                    <img src={`/public/ASSETS/IMAGES/company_logos/${job.company}.png`} alt="" />
+                    <img src={`/PUBLIC/ASSETS/IMAGES/company_logos/${job.company}.png`} alt="" />
                     <div className="jobHeaders">
                       <div className="jobRole">{job.job_role}</div>
                       <div className="jobCompany">{job.company}</div>

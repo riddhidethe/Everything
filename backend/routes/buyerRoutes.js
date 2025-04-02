@@ -445,7 +445,7 @@ router.delete("/delete-profile-pic", authMiddleware(["buyer", "applicant"]), asy
         if (!user || !user.profilePic) return res.status(404).json({ msg: "No profile picture found" });
         
         // Delete file from filesystem
-        const filePath = path.join(__dirname, `../public/uploads/profile_images/${user.profilePic}`);
+        const filePath = path.join(__dirname, `PUBLIC/uploads/profile_images/${user.profilePic}`);
         fs.unlink(filePath, async (err) => {
             if (err) {
                 console.error(err);
