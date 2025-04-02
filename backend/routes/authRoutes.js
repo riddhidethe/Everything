@@ -566,50 +566,9 @@ router.get("/check-auth", authMiddleware, (req, res) => {
     }
 });
 
-
 router.get('/register', (req, res) => {
     res.render('Form/applicant_registration', { errorMsg: null });
 });
-
-// Register a new user
-// router.post("/register", async (req, res) => {
-//     try {
-//         const { name, email, password, confirmPassword, role } = req.body;
-        
-//         if (password !== confirmPassword) {
-//             return res.status(400).json({ msg: "Passwords do not match" });
-//         }
-        
-//         const existingUser = await User.findOne({ email }) || 
-//                               await Seller.findOne({ email }) || 
-//                               await Recruiter.findOne({ email }) ||
-//                               await Admin.findOne({ email });
-
-//         if (existingUser) {
-//             return res.status(400).json({ msg: "Email already exists" });
-//         }
-
-//         const hashedPassword = await bcrypt.hash(password, 10);
-//         let user;
-        
-//         if (role === "seller") user = new Seller({ name, email, password: hashedPassword, role, isActive: true});
-//         else if (role === "recruiter") user = new Recruiter({ name, email, password: hashedPassword, role, isActive: true});
-//         else user = new User({ name, email, password: hashedPassword, role, isActive: true });
-        
-//         await user.save();
-//         //If applicant, redirect to complete profile form
-//         if (role === "applicant") {
-//             // Create session or token for form completion
-//             return res.render('form/complete_form', { msg: "Registration started" });
-//         }
-        
-//         res.redirect('/api/auth/login');
-//         // res.json({ msg: "User registered successfully!" });
-//     } catch (error) {
-//         console.error(error);
-//         res.status(500).json({ msg: "Server error" });
-//     }
-// });
 
 router.post("/register", async (req, res) => {
     try {
@@ -673,7 +632,7 @@ router.post("/login", async (req, res) => {
         if (!isMatch) return res.status(400).json({ msg: "Invalid credentials" });
 
         req.session.user = {
-            id: user._id,
+            _id: user._id,
             role: user.role,
             profilePic: user.profilePic || "user.png"
         };
@@ -702,9 +661,11 @@ router.post("/login", async (req, res) => {
 
 // Function to get redirect URL based on role
 function getRedirectUrl(role, userId) {
-    if (role === "seller") return `/seller/dashboard?userId=${userId}`;
-    if (role === "recruiter") return `/recruiter/dashboard?userId=${userId}`;
-    return `/api/buyer/home?userId=${userId}`;
+    console.log("Redirect Role:", role);
+    if (role === "seller") return `/api/seller/dashboard?userId=${userId}`;
+    else if (role === "recruiter") return `/api/recruiter/dashboard?userId=${userId}`;
+    else if (role === "buyer" || role === "applicant") return `/api/buyer/home?userId=${userId}`;
+    else return "/api/auth/login";
 }
 
 // Logout

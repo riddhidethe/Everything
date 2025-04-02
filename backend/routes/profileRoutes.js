@@ -16,37 +16,63 @@ router.post(
     authMiddleware(["applicant"]),
     upload.fields([{ name: "profilePic", maxCount: 1 }]),
     async (req, res) => {
+        console.log("🔵 Route Hit: /profileComplete");
+
         try {
-            console.log("Session User:", req.session?.user); // Debugging
+            console.log("Session User:", req.session?.user);
 
             if (!req.session?.user || !req.session?.user._id) {
+                console.log("❌ Unauthorized: No session user found.");
                 return res.status(401).json({ msg: "Unauthorized: Session expired or user not found" });
             }
 
             if (!req.files || !req.files["profilePic"]) {
+                console.log("⚠️ No profile image uploaded");
                 return res.status(400).json({ msg: "No profile image uploaded" });
             }
 
             const { fname, lname, age, phoneno, exp, gender } = req.body;
+            console.log("🔹 Received Data:", { fname, lname, age, phoneno, exp, gender });
+
             const profilePicPath = req.files["profilePic"][0].filename;
+            console.log("📷 Profile Pic Path:", profilePicPath);
 
-            const profileData = {
-                applicant_id: req.session.user._id,
-                first_name: fname,
-                last_name: lname,
-                age: age,
-                mobile_no: phoneno,
-                email_id: req.session.user.email,
-                exp: exp,
-                gender: gender,
-                profile_pic_code: profilePicPath
-            };
+            // Check if the user exists before updating
+            const existingUser = await User.findById(req.session.user._id);
+            if (!existingUser) {
+                console.log("❌ User not found in database");
+                return res.status(404).json({ msg: "User not found" });
+            }
 
-            console.log("Profile Data:", profileData);
-            
-            res.render("form/uploadForm", { pd: profileData });
+            // Update the user profile
+            const updatedUser = await User.findByIdAndUpdate(
+                req.session.user._id,
+                {
+                    first_name: fname,
+                    last_name: lname,
+                    age: parseInt(age), // Ensure proper type
+                    mobileNo: phoneno,
+                    exp: parseInt(exp),
+                    gender: gender,
+                    profilePic: profilePicPath,
+                },
+                { new: true } // Return updated document
+            );
+
+            if (!updatedUser) {
+                console.log("❌ Failed to update profile");
+                return res.status(500).json({ msg: "Failed to update profile" });
+            }
+
+            console.log("✅ Updated User:", updatedUser);
+
+            // Update session
+            req.session.user = updatedUser;
+            req.session.save();
+
+            res.render("form/uploadForm", { pd: updatedUser });
         } catch (error) {
-            console.error("Profile Complete Error:", error);
+            console.error("❗ Profile Complete Error:", error);
             res.status(500).json({ msg: "Server error", error: error.message });
         }
     }

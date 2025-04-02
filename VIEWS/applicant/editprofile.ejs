@@ -39,7 +39,7 @@
             <% } %>
           </div>
           <div class="profile-pic-div" id="profile-div">
-            <% if(profilePic == null){ %>
+            <% if(profilePic == null || profilePic === "user.png"){ %>
               <img src="/public/ASSETS/IMAGES/user.png" alt="profile-picture">
             <% }else{ %>
             <img src="/public/ASSETS/UPLOADS/profile_images/<%= profilePic %>" alt="profile-picture">

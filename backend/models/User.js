@@ -21,7 +21,7 @@ const UserSchema = new mongoose.Schema({
     lname: { type: String },
     mobileNo: { type: String, default: "" }, 
     age: { type: Number, default: null }, 
-    gender: { type: String, enum: ["Male", "Female", "Other"], default: "Other" }, 
+    gender: { type: String, enum: ["Male", "Female", "Other"] }, 
 }, { timestamps: true }); // Adds `createdAt` and `updatedAt` timestamps automatically
 
 module.exports = mongoose.model("User", UserSchema);

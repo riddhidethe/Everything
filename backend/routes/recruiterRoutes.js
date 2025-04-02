@@ -23,7 +23,7 @@ router.post("/create-job", authMiddleware(["recruiter"]), async (req, res) => {
 // 📌 Get recruiter dashboard data
 router.get("/dashboard", authMiddleware(["recruiter"]), async (req, res) => {
     try {
-        const recruiterId = req.user.id;
+        const recruiterId = req.user._id;
         const jobs = await Job.find({ recruiterId });
 
         let applicationsReceived = 0;

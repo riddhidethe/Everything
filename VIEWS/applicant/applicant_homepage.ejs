@@ -138,7 +138,7 @@
           </div>
           
           <div class="profile-pic-div" id="profile-div">
-            <% if (typeof profilePic === 'undefined' || profilePic == null || profilePic === '') { %>
+            <% if (typeof profilePic === 'undefined' || profilePic == null || profilePic === '' || profilePic === "user.png") { %>
               <img src="/public/ASSETS/IMAGES/user.png" alt="profile-picture">
             <% } else { %>
               <img src="/public/ASSETS/UPLOADS/profile_images/<%= profilePic %>" alt="profile-picture">
