@@ -20,12 +20,28 @@ const Notification = require("./backend/models/Notification");
 const app = express();
 
 // ✅ Apply Essential Middlewares BEFORE Routes
+const allowedOrigins = [
+    "https://everything-india.vercel.app",
+    "http://localhost:5000"
+];
+
 app.use(cors({
-    origin: ["http://localhost:5000"], // ✅ Change to your frontend URL
-    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-    credentials: true,
-    allowedHeaders: ["Content-Type"], 
+    origin: (origin, callback) => {
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error("Not allowed by CORS"));
+        }
+    },
+    credentials: true
 }));
+
+// app.use(cors({
+//     origin: ["https://everything-india.vercel.app"], // ✅ Change to your frontend URL
+//     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+//     credentials: true,
+//     allowedHeaders: ["Content-Type"], 
+// }));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -40,14 +56,15 @@ app.set('views', path.join(__dirname, 'VIEWS'));
 app.set('view engine', 'ejs');
 
 app.use(session({
-    secret: "your-secret-key",  // Use a strong secret
-    resave: false,  // Prevents unnecessary session saving
-    saveUninitialized: true,  // Avoids saving empty sessions
-    store: MongoStore.create({ mongoUrl: process.env.MONGO_URI }),  // Persist sessions in MongoDB
+    secret: process.env.SESSION_SECRET || "default-secret",
+    resave: false,
+    saveUninitialized: true,
+    store: MongoStore.create({ mongoUrl: process.env.MONGO_URI }),
     cookie: {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",  // Use secure cookies in production
-        maxAge: 24 * 60 * 60 * 1000 // 1 day session expiration
+        secure: process.env.NODE_ENV === "production", // ✅ Secure only in production
+        sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax", // ✅ Required for cross-origin cookies
+        maxAge: 24 * 60 * 60 * 1000 // 1 Day
     }
 }));
 
@@ -55,15 +72,16 @@ app.use(session({
 const connectDB = async () => {
     try {
         await mongoose.connect(process.env.MONGO_URI, {
-            serverSelectionTimeoutMS: 5000 // ⏳ Timeout after 5 seconds if MongoDB is unreachable
+            useNewUrlParser: true, 
+            useUnifiedTopology: true,
+            serverSelectionTimeoutMS: 10000 // ⏳ Increased timeout for slow network
         });
-        console.log("✅ MongoDB Connected");
+        console.log("✅ MongoDB Connected Successfully");
     } catch (err) {
         console.error("❌ MongoDB Connection Error:", err);
         process.exit(1);
     }
 };
-
 
 connectDB();
 
