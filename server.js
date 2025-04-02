@@ -20,11 +20,7 @@ const Notification = require("./backend/models/Notification");
 const app = express();
 
 // ✅ Apply Essential Middlewares BEFORE Routes
-const allowedOrigins = [
-    "https://everything-india.vercel.app",
-    "http://localhost:5000"
-];
-
+const allowedOrigins = ["https://everything-india.vercel.app", "http://localhost:5000"];
 app.use(cors({
     origin: (origin, callback) => {
         if (!origin || allowedOrigins.includes(origin)) {
@@ -132,7 +128,10 @@ app.get('/homepage', async (req, res) => {
 
 // ✅ Server Listener
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+
+if (process.env.NODE_ENV !== "production") {
+    app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+}
 
 // ✅ Handle Graceful Shutdown
 process.on("SIGINT", async () => {
@@ -140,3 +139,5 @@ process.on("SIGINT", async () => {
     await mongoose.connection.close();
     process.exit(0);
 });
+
+module.exports = app; // ✅ Export the app
