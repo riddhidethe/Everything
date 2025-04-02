@@ -55,9 +55,7 @@ app.use(session({
 const connectDB = async () => {
     try {
         await mongoose.connect(process.env.MONGO_URI, {
-            useNewUrlParser: true, 
-            useUnifiedTopology: true, 
-            serverSelectionTimeoutMS: 5000 // ⏳ Timeout MongoDB connection after 5 seconds
+            serverSelectionTimeoutMS: 5000 // ⏳ Timeout after 5 seconds if MongoDB is unreachable
         });
         console.log("✅ MongoDB Connected");
     } catch (err) {
@@ -65,6 +63,7 @@ const connectDB = async () => {
         process.exit(1);
     }
 };
+
 
 connectDB();
 
