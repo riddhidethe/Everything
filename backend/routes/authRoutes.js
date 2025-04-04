@@ -663,10 +663,10 @@ router.post("/login", async (req, res) => {
 // Function to get redirect URL based on role
 function getRedirectUrl(role, userId) {
     console.log("Redirect Role:", role);
-    if (role === "seller") return `/api/seller/dashboard?userId=${userId}`;
-    else if (role === "recruiter") return `/api/recruiter/dashboard?userId=${userId}`;
-    else if (role === "buyer" || role === "applicant") return `/api/buyer/home?userId=${userId}`;
-    else return "/api/auth/login";
+    if (role === "seller") return `/seller/dashboard?userId=${userId}`;
+    else if (role === "recruiter") return `/recruiter/dashboard?userId=${userId}`;
+    else if (role === "buyer" || role === "applicant") return `/applicant/applicant_homepage?userId=${userId}`;
+    else return "/form/login_via_password";
 }
 
 // Logout
