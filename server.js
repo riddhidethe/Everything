@@ -22,24 +22,24 @@ const Notification = require("./backend/models/Notification");
 const app = express();
 
 // ✅ Apply Essential Middlewares BEFORE Routes
-const allowedOrigins = ["https://everything-india.vercel.app", "http://localhost:5000"];
-app.use(cors({
-    origin: (origin, callback) => {
-        if (!origin || allowedOrigins.includes(origin)) {
-            callback(null, true);
-        } else {
-            callback(new Error("Not allowed by CORS"));
-        }
-    },
-    credentials: true
-}));
-
+// const allowedOrigins = [*];
 // app.use(cors({
-//     origin: ["https://everything-india.vercel.app"], // ✅ Change to your frontend URL
-//     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-//     credentials: true,
-//     allowedHeaders: ["Content-Type"], 
+//     origin: (origin, callback) => {
+//         if (!origin || allowedOrigins.includes(origin)) {
+//             callback(null, true);
+//         } else {
+//             callback(new Error("Not allowed by CORS"));
+//         }
+//     },
+//     credentials: true
 // }));
+
+app.use(cors({
+    origin: ["*"], // ✅ Change to your frontend URL
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+    credentials: true,
+    allowedHeaders: ["Content-Type"], 
+}));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -129,9 +129,9 @@ app.get('/homepage', async (req, res) => {
 // ✅ Server Listener
 const PORT = 5000;
 
-if (process.env.NODE_ENV !== "production") {
+// if (process.env.NODE_ENV !== "production") {
     app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
-}
+// }
 
 // ✅ Handle Graceful Shutdown
 process.on("SIGINT", async () => {
