@@ -57,7 +57,7 @@ app.use(session({
     secret: process.env.SESSION_SECRET || "default-secret",
     resave: false,
     saveUninitialized: false,  // ✅ Fix: Prevents empty sessions
-    store: MongoStore.create({ mongoUrl: process.env.MONGO_URI }),
+    // store: MongoStore.create({ mongoUrl: process.env.MONGO_URI }),
     cookie: {
         httpOnly: false,
         secure: process.env.NODE_ENV === "production",
