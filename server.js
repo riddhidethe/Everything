@@ -59,7 +59,7 @@ app.use(session({
     saveUninitialized: false,  // ✅ Fix: Prevents empty sessions
     store: MongoStore.create({ mongoUrl: process.env.MONGO_URI }),
     cookie: {
-        httpOnly: true,
+        httpOnly: false,
         secure: process.env.NODE_ENV === "production",
         sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
         maxAge: 24 * 60 * 60 * 1000 // 1 Day
