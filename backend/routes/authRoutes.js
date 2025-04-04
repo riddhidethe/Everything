@@ -567,7 +567,7 @@ router.get("/check-auth", authMiddleware, (req, res) => {
 });
 
 router.get('/register', (req, res) => {
-    res.render('Form/applicant_registration', { errorMsg: null });
+    res.render('form/applicant_registration', { errorMsg: null });
 });
 
 router.post("/register", async (req, res) => {
