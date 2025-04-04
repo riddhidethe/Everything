@@ -56,12 +56,12 @@ app.set('view engine', 'ejs');
 app.use(session({
     secret: process.env.SESSION_SECRET || "default-secret",
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,  // ✅ Fix: Prevents empty sessions
     store: MongoStore.create({ mongoUrl: process.env.MONGO_URI }),
     cookie: {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production", // ✅ Secure only in production
-        sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax", // ✅ Required for cross-origin cookies
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
         maxAge: 24 * 60 * 60 * 1000 // 1 Day
     }
 }));
