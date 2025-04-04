@@ -646,7 +646,7 @@ router.post("/login", async (req, res) => {
         
             console.log("Session After Login:", req.session); // Check if session is updated
             res.setHeader('Content-Type', 'application/json');
-            res.json({ 
+            res.status(200).json({ 
                 success: true, 
                 userId: user._id, 
                 redirectUrl: getRedirectUrl(user.role, user._id),
