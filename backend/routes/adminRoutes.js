@@ -1,10 +1,10 @@
 const express = require("express");
 const authMiddleware = require("../middleware/authMiddleware");
+const Admin = require("../models/Admin");
+const Recruiter = require("../models/Recruiter");
 const User = require("../models/User");
 const Report = require("../models/Report");
 const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
-// const { Jobs } = require("openai/resources/fine-tuning/jobs/jobs.mjs");
 
 const router = express.Router();
 
@@ -15,7 +15,7 @@ router.use(express.urlencoded({ extended: true }));
 // 📌 Admin dashboard route
 router.get('/', authMiddleware(["admin"]), (req, res) => {
     res.render('admin/admin_home', { 
-        username: req.user.name, 
+        // username: req.session.admin.name, 
         toastNotification: req.query.toastNotification 
     });
 });
@@ -25,42 +25,57 @@ router.get('/login', (req, res) => {
     res.render('admin/admin_login_form', { errorMsg: null });
 });
 
-// 📌 Admin login authentication with JWT
+// 📌 Admin login authentication with SESSION
 router.post('/login', async (req, res) => {
     try {
         const { email, password } = req.body;
-        
-        const admin = await User.findOne({ email, role: "admin" });
-        
+
+        const admin = await Admin.findOne({ email, role: "admin" });
+
         if (!admin) {
             return res.render('admin/admin_login_form', { errorMsg: "Email ID not found" });
         }
-        
-        // Compare hashed password
+
         const passwordMatch = await bcrypt.compare(password, admin.password);
         if (!passwordMatch) {
             return res.render('admin/admin_login_form', { errorMsg: "Wrong Password" });
         }
-        
-        // Generate JWT token
-        const token = jwt.sign(
-            { userId: admin._id, role: admin.role },
-            process.env.JWT_SECRET,
-            { expiresIn: '1d' }
-        );
-        
-        // Set token in cookie
-        res.cookie('jwt', token, {
-            httpOnly: true,
-            maxAge: 24 * 60 * 60 * 1000 // 1 day
-        });
-        
-        res.redirect('/admin?toastNotification=Logged In Successfully!!');
+
+        // Store user in session
+        req.session.admin = {
+            id: admin._id,
+            name: admin.name,
+            role: admin.role
+        };
+
+        res.redirect('/api/admin?toastNotification=Logged In Successfully!!');
     } catch (error) {
         console.error(error);
         res.status(500).json({ msg: "Server error", error });
     }
 });
+
+// Route: GET /api/admin/admin_recruiter_details
+router.get('/admin_recruiter_details', async (req, res) => {
+    try {
+      const recruiters = await Recruiter.find().sort({ createdAt: -1 });
+      res.render('admin/admin_recruiter_details', { recruiters });  // Rendering the view with data
+    } catch (error) {
+      console.error("Error fetching recruiter details:", error);
+      res.status(500).send("Server Error");
+    }
+  });  
+  
+// Route: GET /api/admin/admin_applicant_page
+router.get('/admin_applicant_page', async (req, res) => {
+    try {
+      const applicants = await User.find().sort({ createdAt: -1 });
+      res.render('admin/admin_applicant_page', { applicants }); // Render view with data
+    } catch (error) {
+      console.error("Error fetching applicant details:", error);
+      res.status(500).send("Server Error");
+    }
+  });  
 
 // 📌 Get all users
 router.get("/users", authMiddleware(["admin"]), async (req, res) => {
@@ -103,25 +118,25 @@ router.put("/block-user/:id", authMiddleware(["admin"]), async (req, res) => {
     }
 });
 
-// 📌 Alternative route for blocking/unblocking (GET method from original code)
+// 📌 Alternative block/unblock via query
 router.get('/take-action', authMiddleware(["admin"]), async (req, res) => {
     try {
         const { user_id, isActive } = req.query;
-        
+
         const user = await User.findById(user_id);
         if (!user) return res.status(404).json({ msg: "User not found" });
-        
+
         user.status = isActive === "1" ? "active" : "blocked";
         await user.save();
-        
-        res.redirect('/admin?toastNotification=Status Updated Successfully!!');
+
+        res.redirect('/api/admin?toastNotification=Status Updated Successfully!!');
     } catch (error) {
         console.error(error);
         res.status(500).json({ msg: "Server error", error });
     }
 });
 
-// 📌 Get all reported users or products
+// 📌 Get all reports
 router.get("/reports", authMiddleware(["admin"]), async (req, res) => {
     try {
         const reports = await Report.find().populate("reportedBy", "name email");
@@ -131,76 +146,59 @@ router.get("/reports", authMiddleware(["admin"]), async (req, res) => {
     }
 });
 
-// 📌 Remove a user (API style)
+// 📌 Delete user (API)
 router.delete("/remove-user/:id", authMiddleware(["admin"]), async (req, res) => {
     try {
         const user = await User.findById(req.params.id);
         if (!user) return res.status(404).json({ msg: "User not found" });
 
-        // Store email in ex_users collection if needed
-        const email = user.email;
-        
         await User.findByIdAndDelete(req.params.id);
-        
-        // If you need to keep track of deleted emails
-        // await ExUser.create({ email });
-        
+
         res.json({ msg: "User removed successfully" });
     } catch (error) {
         res.status(500).json({ msg: "Server error", error });
     }
 });
 
-// 📌 Alternative route for user deletion (GET method from original code)
+// 📌 Delete user (GET alternative)
 router.get('/delete-user', authMiddleware(["admin"]), async (req, res) => {
     try {
         const { user_id } = req.query;
-        
+
         const user = await User.findById(user_id);
         if (!user) return res.status(404).json({ msg: "User not found" });
-        
-        // Store email in ex_users collection if needed
-        const email = user.email;
-        
+
         await User.findByIdAndDelete(user_id);
-        
-        res.redirect('/admin?toastNotification=Deleted Successfully!!');
+
+        res.redirect('/api/admin?toastNotification=Deleted Successfully!!');
     } catch (error) {
         console.error(error);
         res.status(500).json({ msg: "Server error", error });
     }
 });
 
-// 📌 Get user details for frontend
+// 📌 Get user details
 router.get('/user-details/:id', authMiddleware(["admin"]), async (req, res) => {
     try {
-        const userId = req.params.id;
-        
-        const user = await User.findById(userId);
+        const user = await User.findById(req.params.id);
         if (!user) return res.status(404).json({ msg: "User not found" });
-        
-        // You might want to fetch additional data related to this user
-        
-        res.json({
-            userData: user
-            // Include any additional data here
-        });
+
+        res.json({ userData: user });
     } catch (error) {
         console.error(error);
         res.status(500).json({ msg: "Server error", error });
     }
 });
 
-// 📌 Update user details with bcrypt hashing
+// 📌 Update user details
 router.post('/update-user/:id', authMiddleware(["admin"]), async (req, res) => {
     try {
         const userId = req.params.id;
         const { name, email, password, status, role } = req.body;
-        
+
         const user = await User.findById(userId);
         if (!user) return res.status(404).json({ msg: "User not found" });
-        
-        // Update user data
+
         if (name) user.name = name;
         if (email) user.email = email;
         if (password) {
@@ -209,39 +207,41 @@ router.post('/update-user/:id', authMiddleware(["admin"]), async (req, res) => {
         }
         if (status) user.status = status;
         if (role) user.role = role;
-        
+
         await user.save();
-        
-        res.redirect('/admin?toastNotification=Updated Successfully!');
+
+        res.redirect('/api/admin?toastNotification=Updated Successfully!');
     } catch (error) {
         console.error(error);
         res.status(500).json({ msg: "Server error", error });
     }
 });
 
+// 📌 Delete job
 router.get('/delete-job', authMiddleware(["admin"]), async (req, res) => {
     try {
-        const { job_id } = req.query;  // Extract job_id from query parameters
-        
-        const job = await Jobs.findById(job_id);
-        if (!job) return res.status(404).json({ msg: "Job not found" });
+        const { job_id } = req.query;
 
-        // Optional: Store deleted job details in another collection if needed
+        const job = await Job.findById(job_id);
+        if (!job) return res.status(404).json({ msg: "Job not found" });
 
         await Job.findByIdAndDelete(job_id);
 
-        res.redirect('/admin?toastNotification=Job Deleted Successfully!!');
+        res.redirect('/api/admin?toastNotification=Job Deleted Successfully!!');
     } catch (error) {
         console.error(error);
         res.status(500).json({ msg: "Server error", error });
     }
 });
 
-
-// 📌 Logout route - clearing JWT cookie
+// 📌 Logout route - destroy session
 router.get('/logout', (req, res) => {
-    res.clearCookie('jwt');
-    res.redirect('/admin/login');
+    req.session.destroy(err => {
+        if (err) {
+            console.error("Logout error:", err);
+        }
+        res.redirect('/api/admin/login');
+    });
 });
 
 module.exports = router;

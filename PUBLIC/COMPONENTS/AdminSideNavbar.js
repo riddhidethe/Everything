@@ -11,8 +11,8 @@ function AdminSideNavBar() {
                 <div className="nav-menu-box">
                     <h4 className="nav-menu-title">Menu</h4>
                     <ul className="nav-menu-list">
-                        <a href="/api/auth/"><li className="nav-menu-items"><span className="material-symbols-outlined">person_apron</span>Recruiter</li></a>
-                        <a href="/api/admin/applicant_page"><li className="nav-menu-items"><span className="material-symbols-outlined">group</span>Applicant</li></a>
+                        <a href="/api/admin/admin_recruiter_details"><li className="nav-menu-items"><span className="material-symbols-outlined">person_apron</span>Recruiter</li></a>
+                        <a href="/api/admin/admin_applicant_page"><li className="nav-menu-items"><span className="material-symbols-outlined">group</span>Applicant</li></a>
                     </ul>
                 </div>
             </div>

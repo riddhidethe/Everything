@@ -82,8 +82,8 @@ router.post(
 // 📌 Complete profile update with resume
 router.post('/updateProfile', authMiddleware(["applicant"]), 
     upload.fields([
-        { name: 'prof-image', maxCount: 1 }, 
-        { name: 'prof-pdf', maxCount: 1 }
+        { name: 'profilePic', maxCount: 1 }, 
+        { name: 'resume', maxCount: 1 }
     ]), 
     async (req, res) => {
         try {
@@ -102,14 +102,14 @@ router.post('/updateProfile', authMiddleware(["applicant"]),
 
             // Determine profile picture filename
             let profile_pic_code;
-            if (profilePic === "uploaded" && req.files['prof-image']) {
-                profile_pic_code = req.files['prof-image'][0].filename;
+            if (profilePic === "uploaded" && req.files['profilePic']) {
+                profile_pic_code = req.files['profilePic'][0].filename;
             } else {
                 profile_pic_code = profilePic;
             }
 
             // Get resume filename
-            const cv = req.files['prof-pdf'][0].filename;
+            const cv = req.files['resume'][0].filename;
 
             // Update user profile in database
             const updatedUser = await User.findByIdAndUpdate(
@@ -144,139 +144,139 @@ router.post('/updateProfile', authMiddleware(["applicant"]),
     }
 );
 
-// 📌 Get user profile
-router.get('/profile', authMiddleware(["applicant"]), async (req, res) => {
-    try {
-        const userId = req.user._id;
+// // 📌 Get user profile
+// router.get('/profile', authMiddleware(["applicant"]), async (req, res) => {
+//     try {
+//         const userId = req.user._id;
         
-        const user = await User.findById(userId);
-        if (!user) {
-            return res.status(404).json({ success: false, msg: "User not found" });
-        }
+//         const user = await User.findById(userId);
+//         if (!user) {
+//             return res.status(404).json({ success: false, msg: "User not found" });
+//         }
         
-        res.status(200).json({
-            success: true,
-            profile: {
-                id: user._id,
-                firstName: user.firstName,
-                lastName: user.lastName,
-                email: user.email,
-                age: user.age,
-                mobileNo: user.mobileNo,
-                experienceLevel: user.experienceLevel,
-                gender: user.gender,
-                skills: user.skills,
-                profilePic: user.profilePic,
-                resume: user.resume
-            }
-        });
-    } catch (error) {
-        res.status(500).json({ success: false, msg: "Server error", error });
-    }
-});
+//         res.status(200).json({
+//             success: true,
+//             profile: {
+//                 id: user._id,
+//                 firstName: user.firstName,
+//                 lastName: user.lastName,
+//                 email: user.email,
+//                 age: user.age,
+//                 mobileNo: user.mobileNo,
+//                 experienceLevel: user.experienceLevel,
+//                 gender: user.gender,
+//                 skills: user.skills,
+//                 profilePic: user.profilePic,
+//                 resume: user.resume
+//             }
+//         });
+//     } catch (error) {
+//         res.status(500).json({ success: false, msg: "Server error", error });
+//     }
+// });
 
-// 📌 Update specific profile fields
-router.patch('/update-fields', authMiddleware(["applicant"]), async (req, res) => {
-    try {
-        const userId = req.user._id;
-        const updates = req.body;
+// // 📌 Update specific profile fields
+// router.patch('/update-fields', authMiddleware(["applicant"]), async (req, res) => {
+//     try {
+//         const userId = req.user._id;
+//         const updates = req.body;
         
-        // Remove any fields that shouldn't be directly updated
-        delete updates.password;
-        delete updates._id;
+//         // Remove any fields that shouldn't be directly updated
+//         delete updates.password;
+//         delete updates._id;
         
-        const updatedUser = await User.findByIdAndUpdate(
-            userId,
-            updates,
-            { new: true }
-        );
+//         const updatedUser = await User.findByIdAndUpdate(
+//             userId,
+//             updates,
+//             { new: true }
+//         );
         
-        if (!updatedUser) {
-            return res.status(404).json({ success: false, msg: "User not found" });
-        }
+//         if (!updatedUser) {
+//             return res.status(404).json({ success: false, msg: "User not found" });
+//         }
         
-        res.status(200).json({
-            success: true,
-            msg: "Profile fields updated successfully",
-            user: updatedUser
-        });
-    } catch (error) {
-        res.status(500).json({ success: false, msg: "Server error", error });
-    }
-});
+//         res.status(200).json({
+//             success: true,
+//             msg: "Profile fields updated successfully",
+//             user: updatedUser
+//         });
+//     } catch (error) {
+//         res.status(500).json({ success: false, msg: "Server error", error });
+//     }
+// });
 
-// 📌 Update just the profile picture
-router.post('/update-profile-picture', authMiddleware(["applicant"]), 
-    upload.single('prof-image'), 
-    async (req, res) => {
-        try {
-            const userId = req.user._id;
+// // 📌 Update just the profile picture
+// router.post('/update-profile-picture', authMiddleware(["applicant"]), 
+//     upload.single('prof-image'), 
+//     async (req, res) => {
+//         try {
+//             const userId = req.user._id;
             
-            if (!req.file) {
-                return res.status(400).json({ 
-                    success: false, 
-                    msg: "No profile picture uploaded" 
-                });
-            }
+//             if (!req.file) {
+//                 return res.status(400).json({ 
+//                     success: false, 
+//                     msg: "No profile picture uploaded" 
+//                 });
+//             }
             
-            const profilePicture = req.file.filename;
+//             const profilePicture = req.file.filename;
             
-            const updatedUser = await User.findByIdAndUpdate(
-                userId,
-                { profilePhoto: profilePicture },
-                { new: true }
-            );
+//             const updatedUser = await User.findByIdAndUpdate(
+//                 userId,
+//                 { profilePhoto: profilePicture },
+//                 { new: true }
+//             );
             
-            if (!updatedUser) {
-                return res.status(404).json({ success: false, msg: "User not found" });
-            }
+//             if (!updatedUser) {
+//                 return res.status(404).json({ success: false, msg: "User not found" });
+//             }
             
-            res.status(200).json({
-                success: true,
-                msg: "Profile picture updated successfully",
-                profilePhoto: profilePicture
-            });
-        } catch (error) {
-            res.status(500).json({ success: false, msg: "Server error", error });
-        }
-    }
-);
+//             res.status(200).json({
+//                 success: true,
+//                 msg: "Profile picture updated successfully",
+//                 profilePhoto: profilePicture
+//             });
+//         } catch (error) {
+//             res.status(500).json({ success: false, msg: "Server error", error });
+//         }
+//     }
+// );
 
-// 📌 Update just the resume/CV
-router.post('/update-resume', authMiddleware(["applicant"]), 
-    upload.single('prof-pdf'), 
-    async (req, res) => {
-        try {
-            const userId = req.user._id;
+// // 📌 Update just the resume/CV
+// router.post('/update-resume', authMiddleware(["applicant"]), 
+//     upload.single('prof-pdf'), 
+//     async (req, res) => {
+//         try {
+//             const userId = req.user._id;
             
-            if (!req.file) {
-                return res.status(400).json({ 
-                    success: false, 
-                    msg: "No resume uploaded" 
-                });
-            }
+//             if (!req.file) {
+//                 return res.status(400).json({ 
+//                     success: false, 
+//                     msg: "No resume uploaded" 
+//                 });
+//             }
             
-            const resume = req.file.filename;
+//             const resume = req.file.filename;
             
-            const updatedUser = await User.findByIdAndUpdate(
-                userId,
-                { resume: resume },
-                { new: true }
-            );
+//             const updatedUser = await User.findByIdAndUpdate(
+//                 userId,
+//                 { resume: resume },
+//                 { new: true }
+//             );
             
-            if (!updatedUser) {
-                return res.status(404).json({ success: false, msg: "User not found" });
-            }
+//             if (!updatedUser) {
+//                 return res.status(404).json({ success: false, msg: "User not found" });
+//             }
             
-            res.status(200).json({
-                success: true,
-                msg: "Resume updated successfully",
-                resume: resume
-            });
-        } catch (error) {
-            res.status(500).json({ success: false, msg: "Server error", error });
-        }
-    }
-);
+//             res.status(200).json({
+//                 success: true,
+//                 msg: "Resume updated successfully",
+//                 resume: resume
+//             });
+//         } catch (error) {
+//             res.status(500).json({ success: false, msg: "Server error", error });
+//         }
+//     }
+// );
 
 module.exports = router;

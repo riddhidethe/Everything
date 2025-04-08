@@ -41,7 +41,14 @@ router.get("/dashboard", authMiddleware(["recruiter"]), async (req, res) => {
             }
         }
 
-        res.json({ 
+        // res.json({ 
+        //     jobsPosted: jobs.length, 
+        //     totalApplications: applicationsReceived,
+        //     pendingApplications,
+        //     interviewScheduled
+        // });
+        res.render("recruiter/dashboard", {
+            recruiterId: user._id,
             jobsPosted: jobs.length, 
             totalApplications: applicationsReceived,
             pendingApplications,

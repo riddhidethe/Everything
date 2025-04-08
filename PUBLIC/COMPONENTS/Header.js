@@ -2,7 +2,7 @@
 function Header(){
     return(
         <>
-          <a className="logo" href="/api/buyer/">Everything<span>.india</span></a>
+          <a className="logo" href="/api/buyer/home">Everything<span>.india</span></a>
           <nav>
             <ul>
               <li><a href="/api/buyer/home" className='navLinks'>Home</a></li>

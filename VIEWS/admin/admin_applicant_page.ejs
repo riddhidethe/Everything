@@ -8,7 +8,7 @@
     <script src="/function/React.js"></script>
     <script src="/function/ReactDOM.js"></script>
     <link rel="shortcut icon" href="/PUBLIC/ASSETS/IMAGES/favicon.png" type="image/x-icon">
-    <link rel="stylesheet" href="/PUBLIC/CSS/admin_style.css">
+    <link rel="stylesheet" href="/PUBLIC/CSS/recruiter_style.css">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <script crossorigin src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
@@ -29,10 +29,12 @@
     </section>
     
     <script type="text/babel" src="/PUBLIC/components/AdminSideNavBar.js"></script>
-    <script type="text/babel" src="/PUBLIC/components/AdminHeader.js"></script>
-    <script type="text/babel" src="/PUBLIC/components/AdminFooter.js"></script>
+    <script type="text/babel" src="/PUBLIC/components/RecruiterHeader.js"></script>
+    <script type="text/babel" src="/PUBLIC/COMPONENTS/RecruiterFooter.js"></script>
 
     <script type="text/babel">
+        const profilePic = "user.png";
+
         const { useState, useEffect } = React;
         function AdminDashboard() {
             const [userList, setUserList] = useState([]);
@@ -40,23 +42,24 @@
             const [currentPage, setCurrentPage] = useState(1);
             const itemsPerPage = 10;
 
+            const BASE_URL = window.location.hostname === 'localhost' ? 'http://localhost:5000' : 'https://your-vercel-url.vercel.app';
+
             useEffect(() => {
                 fetchUserData();
             }, []);
 
             const fetchUserData = () => {
-                axios.get('http://localhost:5000/api/admin/users', {
-                    headers: { Authorization: `Bearer ${yourToken}` }
+                axios.get(`${BASE_URL}/api/admin/users`, {
+                    credentials: "include",
                 })
                     .then(response => setUserList(response.data))
                     .catch(error => console.error("Error fetching users:", error));
             };
 
             const applyFilter = () => {
-                axios.post('http://localhost:5000/api/admin/filter-users', {
-                headers: { Authorization: `Bearer ${yourToken}` } },
-                { status: statusFilter },
-            )
+                axios.get(`${BASE_URL}/api/admin/filter-users`, {
+                    credentials: "include",
+                })
                     .then(response => {
                         setUserList(response.data);
                         setCurrentPage(1);
@@ -133,9 +136,9 @@
         }
 
         ReactDOM.createRoot(document.getElementById('sidenavbar')).render(<AdminSideNavBar />);
-        ReactDOM.createRoot(document.getElementById('admin_header')).render(<AdminHeader title='Admin Dashboard' />);
+        ReactDOM.createRoot(document.getElementById('admin_header')).render(<RecruiterHeader profilePic={profilePic} title='Admin Dashboard' />);
         ReactDOM.createRoot(document.getElementById('content-container')).render(<AdminDashboard />);
-        ReactDOM.createRoot(document.getElementById('footer')).render(<AdminFooter />);
+        ReactDOM.createRoot(document.getElementById('footer')).render(<RecruiterFooter />);
     </script>
 </body>
 </html>

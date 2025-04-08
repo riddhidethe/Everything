@@ -15,7 +15,8 @@ const authMiddleware = (roles = []) => async (req, res, next) => {
 
         // Ensure session and user exist
         if (!req.session || !req.session.user) {
-            return res.status(401).json({ msg: "Access denied. No user session found." });
+            console.log("No session found. Redirecting to login...");
+            return res.redirect("/api/auth/login");
         }
 
         const userId = req.session.user._id; // Use "id" instead of "userId"

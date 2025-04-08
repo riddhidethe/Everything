@@ -25,75 +25,52 @@
   </head>
   <body>
       <!-- header section  -->
-    <header>
-      <div id="header-box">
-        <div class="header-container" id="header">       
-        </div>
-
-        <% if(isLogged != null && isLogged == true) { %>
-        <div class="profile-box">
-          <div class="notification-box" id="notification-bell">
-            <i class="fa-solid fa-bell"></i>
-            <% if(notiResult.length > 0) { %>
-              <div class="notification-indicator"></div>
-            <% } %>
-          </div>
-          <div class="profile-pic-div" id="profile-div">
-            <% if(profilePic == null || profilePic === "user.png"){ %>
-              <img src="/PUBLIC/ASSETS/IMAGES/user.png" alt="profile-picture">
-            <% }else{ %>
-            <img src="/PUBLIC/ASSETS/UPLOADS/profile_images/<%= profilePic %>" alt="profile-picture">
-            <% } %>
-          </div>
-        </div>
-
-        <div class="dropdown-box hidden" id="drop-box">
-          <ul>
-            <li><a href="/api/buyer/edit-profile">Edit Profile</a></li>
-            <li><a href="/api/auth/change-password">Change Password</a></li>
-            <li class="logout-btn"><a href="/api/auth/logout">Logout <i class="fa-solid fa-right-from-bracket"></i></a></li>
-          </ul>
-        </div>
-  
-        <!-- notification area -->
-        <div class="notification-detail-box hidden" id="notification-detail-box">
-          
-          <%if(notiResult.length > 0){%>
-          
-          <ul>
-  
-            <% notiResult.forEach(notification =>{ %>
-              <li class="notification">
-                <div class="notification-upper notification-slot">
-                  <h3><%= notification.job_role %></h3>
-                  <div class="company-logo-box">
-                    <img src="/PUBLIC/ASSETS/IMAGES/company_logos/<%= notification.company %>.png" alt="company-logo">
-                  </div>
-                </div>
-                <div class="notification-lower notification-slot">
-                  <p><span>Status:</span> <%= notification.application_status %></p>
-                  <a href="/api/buyer/delete-notification?jobid=<%= notification.job_id %>"><i class="fa-solid fa-trash"></i></a>
-                </div>
-            </li>
-            <%})%>
+      <header>
+        <div id="header-box">
+          <div class="header-container" id="header"></div>
+          <% if (isLogged != null && isLogged == true) { %>
+          <div class="profile-box" id="profile-box">
+            <div class="notification-box" id="notification-bell">
+              <i class="fa-solid fa-bell"></i>
+              <div class="notification-indicator" style="display: none;"></div>
+            </div>
             
-          </ul>
-  
-          <% }else{ %>
-            <h3 class="no-notification">No notifications yet</h3>
+            <div class="profile-pic-div" id="profile-div">
+              <% if (typeof profilePic === 'undefined' || profilePic == null || profilePic === '' || profilePic === "user.png") { %>
+                <img src="/PUBLIC/ASSETS/IMAGES/user.png" alt="profile-picture">
+              <% } else { %>
+                <img src="/PUBLIC/ASSETS/UPLOADS/profile_images/<%= profilePic %>" alt="profile-picture">
+              <% } %>
+            </div>
+            
+      
+          <div class="dropdown-box hidden" id="drop-box">
+            <ul>
+              <li><a href="/api/buyer/edit-profile">Edit Profile</a></li>
+              <li><a href="/api/buyer/change-password">Change Password</a></li>
+              <li class="logout-btn"><a href="/api/auth/logout">Logout <i class="fa-solid fa-right-from-bracket"></i></a></li>
+            </ul>
+          </div>
+      
+          <div class="notification-detail-box hidden" id="notification-detail-box">
+            <% if (notifications && notifications.length > 0) { %>
+              <% notifications.forEach(notification => { %>
+                <div class="notification-item">
+                  <p><%= notification.jobId.title %>: <%= notification.status %></p>
+                </div>
+              <% }) %>
+            <% } else { %>
+              <h3 class="no-notification">No notifications yet</h3>
+            <% } %>
+          </div>
+          
+          <% } else { %>
+            <div class="button-box" id="btn-box">
+              <a class='myBtn' href="/api/auth/login">Login</a>
+            </div>
           <% } %>
         </div>
-        <!-- notification area -->
-
-        <% } else { %>
-          <div class="button-box" id="btn-box">
-            <a class='myBtn' href="/api/auth/login">Applicant</a>
-            <a class='myBtn' href="/api/auth/login">Recruiter</a>
-          </div>
-        <% } %>
-        
-      </div>
-    </header>
+      </header>
     <!-- header section ends here -->
 
     <section class="edit-profile-section">

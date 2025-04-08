@@ -406,23 +406,33 @@ router.get("/applicant-dashboard", authMiddleware(["buyer", "applicant"]), async
 router.get("/edit-profile", authMiddleware(["buyer", "applicant"]), async (req, res) => {
     try {
         const user = await User.findById(req.user._id);
-        if (!user) return res.status(404).json({ msg: "User not found" });
-        
+        if (!user) return res.status(404).render("error", { msg: "User not found" });
+
         // Get notifications
         const notifications = await Application.find({
             userId: req.user._id,
             isViewed: 1,
             status: { $ne: "pending" }
         }).populate("jobId");
-        
-        res.json({
-            user,
+
+        res.render("applicant/editprofile", {
+            applicant: user,
+            isLogged: true,
             notifications
         });
+        
+        // res.render("applicant/editprofile", {
+        //     userId: user._id,
+        //     profilePic: user.profilePic || "user.png",
+        //     isLogged: true,  // Since user is authenticated
+        //     // r2: popularJobs,
+        //     notifications
+        // });
     } catch (error) {
-        res.status(500).json({ msg: "Server error", error });
+        res.status(500).render("error", { msg: "Server error", error });
     }
 });
+
 
 // 📌 Delete notification
 router.put("/delete-notification/:jobId", authMiddleware(["buyer", "applicant"]), async (req, res) => {
